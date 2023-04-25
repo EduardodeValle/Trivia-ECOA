@@ -16,7 +16,7 @@ function Student() {
       <div className="row justify-content-center">
         <div className="col-md-8">
           <div className="game-container bg-light p-3">
-            <iframe src="../Videogame/index.html" width="300px" height="100px"></iframe> 
+            <iframe src="../Videogame/index.html" width="800px" height="800px"></iframe> 
           </div>
         </div>
       </div>

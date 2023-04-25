@@ -32,8 +32,6 @@ export const getUser = async (req, res) => {
                 resultName = rows[0].nombre;
             }
       
-            console.log("nombre: " + resultName);
-            console.log('========================================');
             res.json({ success: true, ocupacion: result[0].ocupacion, nombre: resultName });
 
         }
