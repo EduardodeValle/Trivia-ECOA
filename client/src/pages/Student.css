@@ -1,14 +1,18 @@
+/* propiedades del fondo que tiene el contenedor del videojuego */
 .student-container {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background-color: black;
   }
   
+  /* propiedades del contenedor del videojuego */
   .game-container {
     border: 1px solid #dee2e6;
     border-radius: 0.25rem;
-    min-height: 500px;
+    min-height: 700px;
+    min-width: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -19,6 +23,7 @@
     justify-content: center;
   }
 
+  
   .unity-game-frame {
     width: 100%;
     height: 100%;
