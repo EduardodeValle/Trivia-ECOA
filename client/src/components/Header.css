@@ -1,0 +1,21 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1660c7;
+    padding: 10px;
+    height: 60px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .title {
+    color: #ffffff;
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  .logo {
+    height: 40px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }

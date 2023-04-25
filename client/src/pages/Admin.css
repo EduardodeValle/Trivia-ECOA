@@ -1,0 +1,62 @@
+.admin-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .admin-header {
+    font-size: 2.5rem;
+    margin-top: 30px; 
+    margin-bottom: 20px;
+  }
+  
+  .admin-main {
+    display: flex;
+    width: 100%;
+  }
+  
+  .admin-left-section {
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    padding: 20px;
+    flex: 1;
+    box-sizing: border-box;
+  }
+  
+  .admin-right-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1.5;
+    padding-left: 10px;
+  }
+  
+  .admin-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    padding: 10px;
+    flex: 1;
+    box-sizing: border-box;
+  }
+  
+  .admin-section h2 {
+    margin-bottom: 10px;
+  }
+
+  .button1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .admin-title {
+    text-align: center;
+    padding-top: 5px;
+  }

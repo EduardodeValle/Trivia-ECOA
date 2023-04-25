@@ -1,0 +1,66 @@
+.activar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 1200px;
+  }
+
+  .activar-title {
+    font-size: 36px;
+    margin-top: 50px;
+  }
+
+  .activar-main {
+    display: flex;
+    justify-content: center;
+    width: 50%;
+  }
+  
+  .activar-grey-container {
+    flex: 1;
+    height: 290px;
+    width: 100%;
+    margin: 30px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+
+  }
+
+  .box-title {
+    text-align: center;
+    padding-top: 20px;
+  }
+
+  .config-text1 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-right: 30px;
+    margin-left: 30px;
+    margin-top: 20px;
+  }
+
+  .config-text2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-top: 10px;
+  }
+
+  .config-text3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .arrow-back-icon3 {
+    display: flex;
+    margin-left: 450px;
+    margin-bottom: 10px;
+    margin-top: -10px;
+  }
