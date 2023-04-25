@@ -1,10 +1,11 @@
 /* propiedades del fondo que tiene el contenedor del videojuego */
 .student-container {
-    min-height: 100vh;
+    /*min-height: 100vh;*/
     display: flex;
     flex-direction: column;
     justify-content: center;
     background-color: black;
+    align-items: left;
   }
   
   /* propiedades del contenedor del videojuego */
@@ -12,7 +13,7 @@
     border: 1px solid #dee2e6;
     border-radius: 0.25rem;
     min-height: 700px;
-    min-width: 500px;
+    min-width: 1000px;
     display: flex;
     align-items: center;
     justify-content: center;

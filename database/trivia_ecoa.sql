@@ -85,6 +85,7 @@ CREATE TABLE Banco_preguntas_ECOA(
     descripcion VARCHAR(200),
     dirigido_a VARCHAR(13),
     tipo VARCHAR(7),
+    archivada BOOL,
     PRIMARY KEY (clave_pregunta)
 );
 
