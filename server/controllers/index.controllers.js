@@ -44,7 +44,7 @@ export const getStudentSurvey = async (req, res) => {
     try {
         const { alumno_matricula } = req.body;
         const [result] = await pool.query("CALL GetSurvey(?);", [alumno_matricula]);
-        console.log(result[0][0])
+        console.log(result[0]);
         console.log("==============================================");
         res.json(result[0]);
     } catch (error) {
