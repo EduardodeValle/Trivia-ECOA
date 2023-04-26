@@ -23,7 +23,8 @@ function Login() {
         console.log("===================================================")
         console.log("El alumno tiene encuestas en " + response_survey.data.length + " materias");
         console.log("===================================================")
-        navigate('/student', { state: { welcomeText: msg } }); 
+        if (response_survey.data.length === 0) { navigate('/student'); }
+        else { navigate('/student-survey', { state: { welcomeText: msg } });  }
       }
       else if (response_login.data.ocupacion === 'Profesor') { navigate('/teacher', { state: { welcomeText: msg } } ); }
       else if (response_login.data.ocupacion === 'Colaborador' || response_login.data.ocupacion === 'ProfesorColaborador') { navigate('/admin', { state: { welcomeText: msg } } ); }

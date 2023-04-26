@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import Login from './pages/Login.jsx'
+import StudentSurvey from './pages/StudentSurvey.jsx'
 import Student from './pages/Student.jsx'
 import Teacher from './pages/Teacher.jsx'
 import Admin from './pages/Admin.jsx'
@@ -17,6 +18,7 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/student-survey" element={<StudentSurvey />} />
         <Route path="/student" element={<Student />} />
         <Route path="/teacher" element={<Teacher />} />
         <Route path="/admin" element={<Admin />} />
