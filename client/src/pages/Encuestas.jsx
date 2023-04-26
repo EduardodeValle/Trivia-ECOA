@@ -46,14 +46,14 @@ function Encuestas() {
     );
   };
 
-    const navigate = useNavigate();
-    const handleRegresar = () => {
-        navigate('/admin');
-      };
-    const handleActivar= () => {
-        navigate('/activar');
-      };
-    
+  const navigate = useNavigate();
+  const handleRegresar = () => {
+    navigate('/admin');
+  };
+  const handleActivar = () => {
+    navigate('/activar');
+  };
+
 
   return (
     <div>
@@ -63,75 +63,76 @@ function Encuestas() {
           <div className="encuestas-grey-container">
             <h2 className="box-title">Crear Encuesta</h2>
             <div className="crear-text2"> Preguntas:
-                <FormControl sx={{ m: 1, width: 300 }}>
+              <FormControl sx={{ m: 1, width: 300 }}>
                 <InputLabel id="demo-multiple-checkbox-label">Selecciona</InputLabel>
                 <Select
-                    labelId="demo-multiple-checkbox-label"
-                    id="demo-multiple-checkbox"
-                    multiple
-                    value={personName}
-                    onChange={handleChange}
-                    input={<OutlinedInput label="Selecciona" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
+                  labelId="demo-multiple-checkbox-label"
+                  id="demo-multiple-checkbox"
+                  multiple
+                  value={personName}
+                  onChange={handleChange}
+                  input={<OutlinedInput label="Selecciona" />}
+                  renderValue={(selected) => selected.join(', ')}
+                  MenuProps={MenuProps}
                 >
-                    {names.map((name) => (
+                  {names.map((name) => (
                     <MenuItem key={name} value={name}>
-                        <Checkbox checked={personName.indexOf(name) > -1} />
-                        <ListItemText primary={name} />
+                      <Checkbox checked={personName.indexOf(name) > -1} />
+                      <ListItemText primary={name} />
                     </MenuItem>
-                    ))}
+                  ))}
                 </Select>
-                </FormControl>
+              </FormControl>
             </div>
             <div className="crear-text3">
-                <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Tipo</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        label="Tipo"
-                    >
-                        <MenuItem>Tipo 1</MenuItem>
-                        <MenuItem>Tipo 2</MenuItem>
-                        <MenuItem>Tipo 3</MenuItem>
-                    </Select>
-                </FormControl>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Tipo</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Tipo"
+                >
+                  <MenuItem>Tipo 1</MenuItem>
+                  <MenuItem>Tipo 2</MenuItem>
+                  <MenuItem>Tipo 3</MenuItem>
+                </Select>
+              </FormControl>
             </div>
             <div className="crear-text1">
-                <TextField fullWidth label="Nombre de la encuesta" id="Nombre de la encuesta" />
+              <TextField fullWidth label="Nombre de la encuesta" id="Nombre de la encuesta" />
             </div>
             <p className="crear-text4">
-                <Button variant="contained">Guardar</Button>
+              <Button variant="contained">Guardar</Button>
             </p>
           </div>
           <div className="encuestas-right-column">
-          <div className="encuestas-grey-container2">
-            <h2 className="box-title">Borrar Encuesta</h2>
-            <p className="borrar-text1">
-            <FormControl fullWidth> 
-                <InputLabel id="demo-simple-select-label">Encuesta</InputLabel>
-                <Select
+            <div className="encuestas-grey-container2">
+              <h2 className="box-title">Borrar Encuesta</h2>
+              <p className="borrar-text1">
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Encuesta</InputLabel>
+                  <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Encuesta"
-                >
+                  >
                     <MenuItem>Pregunta 1</MenuItem>
                     <MenuItem>Pregunta 2</MenuItem>
                     <MenuItem>Pregunta 3</MenuItem>
-                </Select>
-            </FormControl>
-            </p>
-            <p className="borrar-text2">
-                <Button variant="contained">Borrar</Button>
-            </p>
-          </div>
-          <div className="encuestas-grey-container3">
-            <h2 className="box-title">Activar Encuesta</h2>
-            <p className="activar-text1">
+                  </Select>
+                </FormControl>
+              </p>
+              <label>Texto del labeladsssssssssssssssss</label>
+              <p className="borrar-text2">
+                <Button variant="contained">Archivar</Button>
+              </p>
+            </div>
+            <div className="encuestas-grey-container3">
+              <h2 className="box-title">Activar Encuesta</h2>
+              <p className="activar-text1">
                 <Button variant="contained" onClick={handleActivar}>Ingresar para activar</Button>
-            </p>
-          </div>
+              </p>
+            </div>
           </div>
         </div>
       </main>

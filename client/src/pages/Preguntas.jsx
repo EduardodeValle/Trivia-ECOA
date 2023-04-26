@@ -14,10 +14,10 @@ import { useNavigate } from 'react-router-dom';
 
 function Preguntas() {
 
-    const navigate = useNavigate();
-    const handleRegresar = () => {
-        navigate('/admin');
-      };
+  const navigate = useNavigate();
+  const handleRegresar = () => {
+    navigate('/admin');
+  };
 
   return (
     <div>
@@ -26,67 +26,90 @@ function Preguntas() {
         <div className="preguntas-main">
           <div className="preguntas-grey-container">
             <h2 className="box-title">Altas</h2>
-            <p className="altas-text1">Pregunta:  
-                <TextField id="filled-basic" label="Crea una pregunta" variant="outlined" />
+            <p className="altas-text1">Clave:
+              <TextField id="filled-basic" label="Identificador único" variant="outlined" />
             </p>
-            <p className="altas-text2">Tipo: 
-                <FormGroup>
-                    <FormControlLabel control={<Checkbox />} label="Rango" />
-                    <FormControlLabel control={<Checkbox />} label="Abierta" />
-                </FormGroup>
+            <p className="altas-text1">Pregunta:
+              <TextField id="filled-basic" label="Descripción" variant="outlined" />
             </p>
-            <p className="altas-text3">
-                <Button variant="contained">Guardar</Button>
+            <p className="altas-text2">Tipo:
+              <FormGroup>
+                <FormControlLabel control={<Checkbox />} label="Rango" />
+                <FormControlLabel control={<Checkbox />} label="Abierta" />
+              </FormGroup>
+            </p>
+            <p className="altas-text3">Dirigido a:
+              <FormGroup>
+                <FormControlLabel control={<Checkbox />} label="Profesor" />
+                <FormControlLabel control={<Checkbox />} label="Materia" />
+                <FormControlLabel control={<Checkbox />} label="Bloque" />
+              </FormGroup>
+            </p>
+            <p className="altas-text4">
+              <Button variant="contained">Guardar</Button>
             </p>
           </div>
           <div className="preguntas-grey-container">
             <h2 className="box-title">Bajas</h2>
             <p className="bajas-text1">
-            <FormControl fullWidth>
+              <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">Pregunta</InputLabel>
                 <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Pregunta"
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Pregunta"
                 >
-                    <MenuItem>Pregunta 1</MenuItem>
-                    <MenuItem>Pregunta 2</MenuItem>
-                    <MenuItem>Pregunta 3</MenuItem>
+                  <MenuItem>Pregunta 1</MenuItem>
+                  <MenuItem>Pregunta 2</MenuItem>
+                  <MenuItem>Pregunta 3</MenuItem>
                 </Select>
-            </FormControl>
+              </FormControl>
             </p>
             <p className="bajas-text2">
-                <Button variant="contained">Borrar</Button>
+              <Button variant="contained">Archivar</Button>
             </p>
           </div>
           <div className="preguntas-grey-container">
             <h2 className="box-title">Cambios</h2>
             <p className="cambios-text1">
-            <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Pregunta</InputLabel>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Clave</InputLabel>
                 <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Pregunta"
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Pregunta"
                 >
-                    <MenuItem>Pregunta 1</MenuItem>
-                    <MenuItem>Pregunta 2</MenuItem>
-                    <MenuItem>Pregunta 3</MenuItem>
+                  <MenuItem>Pregunta 1</MenuItem>
+                  <MenuItem>Pregunta 2</MenuItem>
+                  <MenuItem>Pregunta 3</MenuItem>
                 </Select>
-            </FormControl>
+              </FormControl>
             </p>
-            <p className="cambios-text2">Editar:  
-                <TextField id="filled-basic" label="Edita la pregunta" variant="outlined" />
+            <p className="cambios-text1">Pregunta:
+              <TextField id="filled-basic" label="Descripción" variant="outlined" />
             </p>
-            <p className="cambios-text3">
-                <Button variant="contained">Guardar</Button>
+            <p className="cambios-text2">Tipo:
+              <FormGroup>
+                <FormControlLabel control={<Checkbox />} label="Rango" />
+                <FormControlLabel control={<Checkbox />} label="Abierta" />
+              </FormGroup>
+            </p>
+            <p className="cambios-text3">Dirigido a:
+              <FormGroup>
+                <FormControlLabel control={<Checkbox />} label="Profesor" />
+                <FormControlLabel control={<Checkbox />} label="Materia" />
+                <FormControlLabel control={<Checkbox />} label="Bloque" />
+              </FormGroup>
+            </p>
+            <p className="cambios-text4">
+              <Button variant="contained">Guardar</Button>
             </p>
           </div>
         </div>
       </main>
       <div className="arrow-back-icon2">
         <Button variant="contained" onClick={handleRegresar} startIcon={<ArrowBackIcon />}></Button>
-        </div>
+      </div>
     </div>
   );
 }
