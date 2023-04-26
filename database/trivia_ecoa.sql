@@ -320,13 +320,17 @@ DELIMITER //
 CREATE PROCEDURE GetSurvey(
 	IN matricula VARCHAR(9))
 BEGIN 
-	SELECT * FROM Alumno 
+	SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.CRN, Encuesta.clave_encuesta, Encuesta.descripcion, Encuesta.fecha_inicio, Encuesta.fecha_final, Encuesta.activa 
+    FROM Alumno 
 	INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
+    INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
 	INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
 	INNER JOIN Encuesta ON (Materias_de_encuesta.clave_encuesta = Encuesta.clave_encuesta)
 	WHERE Alumno.alumno_matricula = matricula AND Encuesta.activa = 1;
 END //
 DELIMITER ;
+
+CALL GetSurvey('A00228079');
 
 # ---------------------------------------------------------------------------------------------------------
 
@@ -356,7 +360,6 @@ DELIMITER ;
 # A00228079
 
 CALL GetTeachersQuestions('A00228079');
-DROP PROCEDURE GetTeachersQuestions;
 
 # ---------------------------------------------------------------------------------------------------------
 
@@ -365,21 +368,21 @@ DROP PROCEDURE GetTeachersQuestions;
 # que estudia el alumno. Se ejecuta en la plantilla que renderiza el juego solamente si el alumno cursa al 
 # menos una 'Materia'
 DELIMITER //
-CREATE PROCEDURE GetTeachersQuestions(
+CREATE PROCEDURE GetSubjectsQuestions(
 	IN matricula VARCHAR(9))
 BEGIN 
-	SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Profesor.profesor_nomina, Profesor.nombre, Banco_preguntas_ECOA.descripcion
+	SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Banco_preguntas_ECOA.descripcion
 	FROM Alumno INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
 	INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
-	INNER JOIN Imparte ON (Cursa.CRN = Imparte.CRN)
-	INNER JOIN Profesor ON (Imparte.profesor_nomina = Profesor.profesor_nomina)
 	INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
 	INNER JOIN Encuesta ON (Materias_de_encuesta.clave_encuesta = Encuesta.clave_encuesta)
 	INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
 	INNER JOIN Banco_preguntas_ECOA ON (Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
-	WHERE Alumno.alumno_matricula = matricula AND Banco_preguntas_ECOA.dirigido_a = 'Profesor';
+	WHERE Alumno.alumno_matricula = matricula AND Materia.tipodeUdF = 'Materia' AND Banco_preguntas_ECOA.dirigido_a = 'Materia';
 END //
 DELIMITER ;
+
+CALL GetSubjectsQuestions('A00228079');
 
 # ---------------------------------------------------------------------------------------------------------
 
@@ -387,6 +390,24 @@ DELIMITER ;
 # Este store procedure devuelve una tabla con todas las preguntas dirigidas a un bloque o concentracion a todas
 # las UdF de este tipo que estudia el alumno. Se ejecuta en la plantilla que renderiza el juego solamente si el 
 # alumno cursa al menos un 'Bloque' o 'Concentracion'
+DELIMITER //
+CREATE PROCEDURE GetCoreSubjectsQuestions(
+	IN matricula VARCHAR(9))
+BEGIN 
+	SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Banco_preguntas_ECOA.descripcion
+	FROM Alumno INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
+	INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
+	INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
+	INNER JOIN Encuesta ON (Materias_de_encuesta.clave_encuesta = Encuesta.clave_encuesta)
+	INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
+	INNER JOIN Banco_preguntas_ECOA ON (Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
+	WHERE Alumno.alumno_matricula = matricula 
+    AND (Materia.tipodeUdF = 'Bloque' OR Materia.tipodeUdF = 'Concentración')
+    AND (Banco_preguntas_ECOA.dirigido_a = 'Bloque' OR Banco_preguntas_ECOA.dirigido_a = 'Concentración');
+END //
+DELIMITER ;
+
+CALL GetCoreSubjectsQuestions('A00228079');
 
 # =========================================================================================================
 
@@ -436,18 +457,25 @@ SELECT * FROM Usuario WHERE ocupacion = "ProfesorColaborador";
 SELECT * FROM ProfesorColaborador;
 UPDATE Usuario SET ocupacion = 'ProfesorColaborador' WHERE ocupacion = 'Profesor Colaborador';
 
-insert into Encuesta(clave_encuesta, descripcion, fecha_inicio, fecha_final, periodo_de_activacion, activa) values ("s1", "encuesta1", "2023-04-25", "2023-04-30", "p1", 0);
-insert into Encuesta(clave_encuesta, descripcion, periodo_de_activacion, activa) values ("s2", "encuesta2", "p2", 0);
+insert into Encuesta(clave_encuesta, descripcion, fecha_inicio, fecha_final, activa) values ("s1", "encuesta1", "2023-04-25", "2023-04-30", 0);
+insert into Encuesta(clave_encuesta, descripcion, activa) values ("s2", "encuesta2", 0);
 
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta1", "El profesor(a) muestra dominio y experiencia en los temas de la Materia:", "Profesor", "Cerrada");
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta2", "Los temas, las actividades y el reto durante el Bloque:A) Me permitieron aprender y desarrollarme.", "Bloque", "Cerrada");
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta3", "Los temas, las actividades y la situación-problema durante la Materia:A) Me permitieron aprender y desarrollarme.", "Materia", "Cerrada");
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta4", "El profesor(a) promovió un ambiente de confianza y de respeto:", "Profesor", "Cerrada");
+insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta5", "Los temas vistos en la UdF son aplicables y de valor en la industria:", "Materia", "Cerrada");
+insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta6", "El bloque se desarrolló de manera coordinada entre los (as) profesores (as):", "Bloque", "Cerrada");
+insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta7", "Los temas, las actividades y el reto durante el Bloque son aplicables y de valor:", "Bloque", "Cerrada");
+
 
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta1");
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta2");
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta3");
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta4");
+insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta5");
+insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta6");
+insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta7");
 
 insert into Materias_de_encuesta(clave_encuesta, CRN) values("s1", 31696);
 insert into Materias_de_encuesta(clave_encuesta, CRN) values("s1", 41765);
@@ -469,7 +497,7 @@ CALL GetSurvey('A00230099');
 # "Análisis de circuitos eléctricos de corriente alterna"	31696	L00622354
 
 # obteniendo todas las materias que estudia el alumno
-SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Cursa.CRN FROM Alumno
+SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Cursa.CRN FROM Alumno
 INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula) 
 INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
 WHERE Alumno.alumno_matricula = @matricula;
