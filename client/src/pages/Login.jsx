@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RequestLogin } from '../api/tasks.api.js'
+import { RequestLogin, RequestStudentSurvey } from '../api/tasks.api.js'
 import './Login.css';
 
 
@@ -15,12 +15,18 @@ function Login() {
       "id_usuario": id_usuario,
       "contrasenia": contrasenia
     };
-    const response = await RequestLogin(credentials);
-    if (response.data.success) {
-      const msg = 'Bienvenido ' + response.data.nombre;
-      if (response.data.ocupacion === 'Alumno') { navigate('/student', { state: { welcomeText: msg } }); }
-      else if (response.data.ocupacion === 'Profesor') { navigate('/teacher', { state: { welcomeText: msg } } ); }
-      else if (response.data.ocupacion === 'Colaborador' || response.data.ocupacion === 'ProfesorColaborador') { navigate('/admin', { state: { welcomeText: msg } } ); }
+    const response_login = await RequestLogin(credentials);
+    if (response_login.data.success) {
+      const msg = 'Bienvenido ' + response_login.data.nombre;
+      if (response_login.data.ocupacion === 'Alumno') { 
+        const response_survey = await RequestStudentSurvey({ "alumno_matricula": id_usuario });
+        console.log("===================================================")
+        console.log("El alumno tiene encuestas en " + response_survey.data.length + " materias");
+        console.log("===================================================")
+        navigate('/student', { state: { welcomeText: msg } }); 
+      }
+      else if (response_login.data.ocupacion === 'Profesor') { navigate('/teacher', { state: { welcomeText: msg } } ); }
+      else if (response_login.data.ocupacion === 'Colaborador' || response_login.data.ocupacion === 'ProfesorColaborador') { navigate('/admin', { state: { welcomeText: msg } } ); }
     } else {
       console.log('Credenciales incorrectas, por favor intente de nuevo.');
     }

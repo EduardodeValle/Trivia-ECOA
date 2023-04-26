@@ -2,7 +2,7 @@ import { pool } from '../db.js'
 
 export const getUser = async (req, res) => {
     try {
-        const { id_usuario, contrasenia } = req.body
+        const { id_usuario, contrasenia } = req.body;
         const [result] = await pool.query(
             "SELECT * FROM Usuario WHERE id_usuario = ? AND contrasenia = ?;",
             [id_usuario, contrasenia]
@@ -37,5 +37,18 @@ export const getUser = async (req, res) => {
         }
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+}
+
+export const getStudentSurvey = async (req, res) => {
+    try {
+        const { alumno_matricula } = req.body;
+        const [result] = await pool.query("CALL GetSurvey(?);", [alumno_matricula]);
+        console.log(result[0][0])
+        console.log("==============================================");
+        res.json(result[0]);
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
     }
 }

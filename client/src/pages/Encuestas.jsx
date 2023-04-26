@@ -122,7 +122,6 @@ function Encuestas() {
                   </Select>
                 </FormControl>
               </p>
-              <label>Texto del labeladsssssssssssssssss</label>
               <p className="borrar-text2">
                 <Button variant="contained">Archivar</Button>
               </p>

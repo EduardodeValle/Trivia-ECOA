@@ -89,6 +89,10 @@ CREATE TABLE Banco_preguntas_ECOA(
     PRIMARY KEY (clave_pregunta)
 );
 
+
+
+SELECT * FROM Banco_preguntas_ECOA;
+
 CREATE TABLE Encuesta(
 	clave_encuesta VARCHAR(10),
     descripcion VARCHAR(150),
@@ -287,14 +291,41 @@ DELIMITER ;
 
 # Store procedures 3
 # Cada vez que se activa una encuesta se seleccionan todas las materias que pertenecen a esa encuesta, luego se seleccionan 
-# todos los alumnos de cada materia para crear un perfil de cada alumno en Elementos_de_partida y tambien para crear n 
-# registros por cada alumno en la tabla Progreso_ECOA donde n es el numero de preguntas de la encuesta
+# todos los alumnos de cada materia para crear n registros por cada alumno en la tabla Progreso_ECOA donde n es el numero 
+# de preguntas de la encuesta
 
 SELECT Encuesta.clave_encuesta, Alumno.alumno_matricula, Materia.nombre_materia_largo FROM Encuesta INNER JOIN materias_de_encuesta ON (Encuesta.clave_encuesta = Materias_de_encuesta.clave_encuesta)
 INNER JOIN Materia ON (Materias_de_encuesta.CRN = Materia.CRN)
 INNER JOIN Cursa ON (Materia.CRN = Cursa.CRN)
 INNER JOIN Alumno ON (Cursa.alumno_matricula = Alumno.alumno_matricula);
+
+# ---------------------------------------------------------------------------------------------------------
+
+# Store procedures 4
+# Cada vez que se activa una encuesta se seleccionan las materias que pertenecen a esa encuesta y luego las matriculas
+# unicas de los alumnos que estudian esas materias para crear un registro por cada alumno en Elementos_de_partida
+
+# ---------------------------------------------------------------------------------------------------------
+
+# Store procedures 5
+# Este store procedure revisa si hay encuestas disponibles para el alumno, si no hay encuestas disponibles
+# entonces devuelve 0 registros
+
+DELIMITER //
+CREATE PROCEDURE GetSurvey(
+	IN matricula VARCHAR(9))
+BEGIN 
+	SELECT * FROM Alumno 
+	INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
+	INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
+	INNER JOIN Encuesta ON (Materias_de_encuesta.clave_encuesta = Encuesta.clave_encuesta)
+	WHERE Alumno.alumno_matricula = matricula AND Encuesta.activa = 1;
+END //
+DELIMITER ;
+
+
 # =========================================================================================================
+
 
 # Otros querys 1
 # Cada vez que un usuario responde una pregunta de ECOA se guarda ese registro en ECOA_temporal
@@ -307,35 +338,23 @@ SELECT Cursa.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF F
 GROUP BY Materia.nombre_materia_largo
 HAVING count(Cursa.alumno_matricula) < 25;
 
-# Aplicación de la teoría electromagnética
-# Análisis de circuitos eléctricos de corriente alterna
-# Análisis de esfuerzos y deformaciones
-
 SELECT Cursa.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF FROM Cursa INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
 WHERE Materia.nombre_materia_largo = 'Análisis de circuitos eléctricos de corriente alterna';
 
 SELECT Cursa.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF FROM Cursa INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
-WHERE Cursa.alumno_matricula = 'A00228150';
-
-# Alumnos de 'Herramientas básicas para la modelación de situaciones reales' (materia)
-# A00237794 2 materias y 1 bloque
-# A00238449 1 materia
-# A00240159 1 materia
-# A00240830 1 materia
-# A00242322 1 materia
-# A00242809 1 materia 
+WHERE Cursa.alumno_matricula = 'A00228208';
 
 # Este query devuelve las materias que estudian todos los alumnos que estudian la materia ingresada
 # La clausula IN devuelve todos los registros de una tabla o subconsulta que se encuentran en la 
 # columna adentro de la clausula. Es importante que adentro de la clausula IN solo se devuelva
 # una coluna
-SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF FROM Cursa
+SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN FROM Cursa
 INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
 WHERE Cursa.alumno_matricula IN (
 	SELECT Cursa.alumno_matricula FROM Cursa INNER JOIN Materia M ON Cursa.CRN = M.CRN WHERE M.nombre_materia_largo = 'Aplicación de la teoría electromagnética'
 ) ORDER BY Cursa.alumno_matricula;
 
-SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, count(*) AS total_alumnos FROM Cursa
+SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN, count(*) AS total_alumnos FROM Cursa
 INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
 WHERE Cursa.alumno_matricula IN (
 	SELECT Cursa.alumno_matricula FROM Cursa INNER JOIN Materia M ON Cursa.CRN = M.CRN WHERE M.nombre_materia_largo = 'Aplicación de la teoría electromagnética'
@@ -350,7 +369,42 @@ SELECT * FROM Usuario;
 SELECT * FROM Alumno;
 SELECT * FROM Profesor;
 SELECT * FROM Colaborador;
+SELECT * FROM Materia;
 SELECT * FROM Usuario WHERE id_usuario = "A00226903" AND contrasenia = "A00226903";
 SELECT * FROM Usuario WHERE ocupacion = "ProfesorColaborador";
 SELECT * FROM ProfesorColaborador;
 UPDATE Usuario SET ocupacion = 'ProfesorColaborador' WHERE ocupacion = 'Profesor Colaborador';
+
+# "Análisis de circuitos eléctricos de corriente alterna"
+# "Herramientas básicas para la modelación de situaciones reales"
+# A00228208
+
+insert into Encuesta(clave_encuesta, descripcion, fecha_inicio, fecha_final, periodo_de_activacion, activa) values ("s1", "encuesta1", "2023-04-25", "2023-04-30", "p1", 0);
+insert into Encuesta(clave_encuesta, descripcion, periodo_de_activacion, activa) values ("s2", "encuesta2", "p2", 0);
+
+insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta1", "El profesor(a) muestra dominio y experiencia en los temas de la Materia:", "profesor", "cerrada");
+insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta2", "Los temas, las actividades y el reto durante el Bloque:A) Me permitieron aprender y desarrollarme.", "bloque", "cerrada");
+insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta3", "Los temas, las actividades y la situación-problema durante la Materia:A) Me permitieron aprender y desarrollarme.", "materia", "cerrada");
+
+insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta1");
+insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta2");
+insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta3");
+
+insert into Materias_de_encuesta(clave_encuesta, CRN) values("s1", 31696);
+insert into Materias_de_encuesta(clave_encuesta, CRN) values("s1", 41765);
+
+SELECT * FROM Materias_de_encuesta;
+SELECT * FROM Encuesta;
+SELECT * FROM Materia WHERE CRN = 32701;
+SET @matricula = 'A00230099'; 
+# Alumnos con encuesta en todas sus materias (2 encuestas) A00228187 A00228208 A00229540 A00228079
+# Alumno que estudia las mismas materias pero diferentes grupos (0 encuestas) A00234284
+# Alumno que estudia 3 materias al mismo tiempo pero solo tieneencuesta de 2 materias: A00230099
+
+CALL GetSurvey('A00230099'); 
+
+# obteniendo todas las materias que estudia el alumno
+SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Cursa.CRN FROM Alumno
+INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula) 
+INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
+WHERE Alumno.alumno_matricula = @matricula;

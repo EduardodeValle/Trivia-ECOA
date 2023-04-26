@@ -65,6 +65,7 @@ function Preguntas() {
                 </Select>
               </FormControl>
             </p>
+            <label>Textbox with question description here</label>
             <p className="bajas-text2">
               <Button variant="contained">Archivar</Button>
             </p>
