@@ -121,6 +121,7 @@ CREATE TABLE Progreso_ECOA(
 	alumno_matricula VARCHAR(9),
     clave_encuesta VARCHAR(10),
     clave_pregunta VARCHAR(10),
+    contestado BOOL,
     FOREIGN KEY (alumno_matricula) REFERENCES Usuario(id_usuario),
     FOREIGN KEY (clave_encuesta) REFERENCES Encuesta(clave_encuesta),
     FOREIGN KEY (clave_pregunta) REFERENCES Banco_preguntas_ECOA(clave_pregunta)
@@ -188,6 +189,7 @@ CREATE TABLE ArchivoCSV (
 );
 
 # =========================================================================================================
+# =========================================================================================================
 
 # Trigger 1
 # Primero los datos se insertan en la tabla ArchivoCSV con todas las columnas y el trigger 1 debe insertar automaticamente los datos
@@ -247,7 +249,6 @@ DELIMITER ;
 
 # Trigger 3
 # Cada vez que se inserta un nuevo alumno también se debe crear su perfil de juego con su balance de monedas en 0
-
 DELIMITER //
 CREATE TRIGGER crear_perfil_de_juego AFTER INSERT ON Alumno
 FOR EACH ROW
@@ -256,33 +257,60 @@ BEGIN
 END//
 DELIMITER ;
 
-# ---------------------------------------------------------------------------------------------------------
-
-# Trigger 4
-# Cada vez que un usuario responde una pregunta de ECOA se guarda ese registro en ECOA_temporal y se marca
-# esa pregunta como contestada en Progreso_ECOA
-
+# =========================================================================================================
 # =========================================================================================================
 
 # Store procedures 1
 # Cada vez que se activa una encuesta se seleccionan todas las materias que pertenecen a esa encuesta, luego se seleccionan 
-# todos los alumnos de cada materia para crear n registros por cada alumno en la tabla Progreso_ECOA donde n es el numero 
-# de preguntas de la encuesta
+# todos los alumnos unicos de cada materia para crear n registros por cada alumno en la tabla Progreso_ECOA donde n es el numero 
+# de preguntas de la encuesta y ademas se debe crear un perfil de juego en Elementos_de_partida para cada alumno unico que
+# recibe una encuesta.
+DELIMITER //
+CREATE PROCEDURE setProgresoECOA(
+	IN clavedeencuesta VARCHAR(10))
+BEGIN
+	# Insertando todas las preguntas de la encuesta por alumno como no contestadas
+	INSERT INTO Progreso_ECOA (alumno_matricula, clave_encuesta, clave_pregunta, contestado)
+	SELECT alumno_matricula, clavedeencuesta, clave_pregunta, 0
+	FROM (
+			SELECT DISTINCT(Alumno.alumno_matricula)
+			FROM Encuesta INNER JOIN materias_de_encuesta ON (Encuesta.clave_encuesta = Materias_de_encuesta.clave_encuesta)
+			INNER JOIN Cursa ON (Materias_de_encuesta.CRN = Cursa.CRN)
+			INNER JOIN Alumno ON (Cursa.alumno_matricula = Alumno.alumno_matricula)
+			WHERE Encuesta.clave_encuesta = clavedeencuesta
+		 ) AS usuarios_unicos
+	CROSS JOIN
+		(
+			SELECT Banco_preguntas_ECOA.clave_pregunta 
+			FROM Encuesta 
+			INNER JOIN Preguntas_de_encuesta ON Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta
+			INNER JOIN Banco_preguntas_ECOA ON Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta
+			WHERE Encuesta.clave_encuesta = clavedeencuesta
+		) AS preguntas_de_encuesta;
+	
+    # Creando los perfiles del videojuego para cada alumno unico que recibe una encuesta
+    INSERT INTO Elementos_de_partida (alumno_matricula, puntos, ronda, partida_pendiente)
+    SELECT alumno_matricula, 0, 1, 0 
+    FROM (
+			SELECT DISTINCT(Alumno.alumno_matricula)
+			FROM Encuesta INNER JOIN materias_de_encuesta ON (Encuesta.clave_encuesta = Materias_de_encuesta.clave_encuesta)
+			INNER JOIN Cursa ON (Materias_de_encuesta.CRN = Cursa.CRN)
+			INNER JOIN Alumno ON (Cursa.alumno_matricula = Alumno.alumno_matricula)
+			WHERE Encuesta.clave_encuesta = clavedeencuesta
+		 ) AS usuarios_unicos;
+END //
+DELIMITER ;
 
-SELECT Encuesta.clave_encuesta, Alumno.alumno_matricula, Materia.nombre_materia_largo FROM Encuesta INNER JOIN materias_de_encuesta ON (Encuesta.clave_encuesta = Materias_de_encuesta.clave_encuesta)
-INNER JOIN Materia ON (Materias_de_encuesta.CRN = Materia.CRN)
-INNER JOIN Cursa ON (Materia.CRN = Cursa.CRN)
-INNER JOIN Alumno ON (Cursa.alumno_matricula = Alumno.alumno_matricula);
-
+DELETE FROM Progreso_ECOA;
+DELETE FROM Elementos_de_partida;
+DROP PROCEDURE setProgresoECOA;
+CALL setProgresoECOA('s1');
+           
+SELECT * FROM Progreso_ECOA;
+SELECT * FROM Elementos_de_partida;
 # ---------------------------------------------------------------------------------------------------------
 
 # Store procedures 2
-# Cada vez que se activa una encuesta se seleccionan las materias que pertenecen a esa encuesta y luego las matriculas
-# unicas de los alumnos que estudian esas materias para crear un registro por cada alumno en Elementos_de_partida
-
-# ---------------------------------------------------------------------------------------------------------
-
-# Store procedures 3
 # Cuando el usuario termina de responder todas las preguntas de una encuesta sus registros de la tabla de ECOA_temporal
 # pasan a la tabla ECOA_definitiva generando el folio y eliminando los registros de ese usuario en ECOA_temporal
 DELIMITER //
@@ -298,7 +326,7 @@ DELIMITER ;
 
 # ---------------------------------------------------------------------------------------------------------
 
-# Store procedures 4
+# Store procedures 3
 # Cuando el usuario termina cualquier ronda de juego se eliminan sus registros de la tabla Progreso_trivia y se reinician
 # sus registros de la tabla Elementos_de_partida
 DELIMITER //
@@ -313,7 +341,7 @@ DELIMITER ;
 
 # ---------------------------------------------------------------------------------------------------------
 
-# Store procedures 5
+# Store procedures 4
 # Este store procedure revisa si hay encuestas disponibles para el alumno, si no hay encuestas disponibles
 # entonces devuelve 0 registros
 DELIMITER //
@@ -330,11 +358,11 @@ BEGIN
 END //
 DELIMITER ;
 
-CALL GetSurvey('A00228079');
+CALL GetSurvey('A00227251');
 
 # ---------------------------------------------------------------------------------------------------------
 
-# Store procedures 6
+# Store procedures 5
 # Este store procedure devuelve una tabla con todas las preguntas dirigidas a un profesor paraa todos los profesores
 # que le dan clases al alumno. Se ejecuta en la plantilla que renderiza el juego y es obligatorio este store procedure
 DELIMITER //
@@ -363,7 +391,7 @@ CALL GetTeachersQuestions('A00228079');
 
 # ---------------------------------------------------------------------------------------------------------
 
-# Store procedures 7
+# Store procedures 6
 # Este store procedure devuelve una tabla con todas las preguntas dirigidas a una materia paraa todas las materias
 # que estudia el alumno. Se ejecuta en la plantilla que renderiza el juego solamente si el alumno cursa al 
 # menos una 'Materia'
@@ -386,7 +414,7 @@ CALL GetSubjectsQuestions('A00228079');
 
 # ---------------------------------------------------------------------------------------------------------
 
-# Store procedures 8
+# Store procedures 7
 # Este store procedure devuelve una tabla con todas las preguntas dirigidas a un bloque o concentracion a todas
 # las UdF de este tipo que estudia el alumno. Se ejecuta en la plantilla que renderiza el juego solamente si el 
 # alumno cursa al menos un 'Bloque' o 'Concentracion'
@@ -409,12 +437,31 @@ DELIMITER ;
 
 CALL GetCoreSubjectsQuestions('A00228079');
 
+# ---------------------------------------------------------------------------------------------------------
+
+# Store procedure 8
+# Cada vez que termina el periodo de ECOAS se eliminan todos los registros de las tablas 
+# ECOA_temporal, Progreso_ECOA, Elementos_de_partida y Progreso_trivia
+
+# =========================================================================================================
 # =========================================================================================================
 
-
 # Otros querys 1
-# Cada vez que termina el periodo de ECOAS se eliminan todos los registros de ECOA_temporal y de Elementos_de_partida
+# Cuando el alumno responde una pregunta de ecoa se insertan los datos en ECOA_temporal, no vale la pena que sea
+# un store procedure porque solo ejecuta una sola accion que es insertar datos en una sola tabla
 
+# Otros querys 2
+# si el alumno termino de responder una pregunta para todos sus profesores, materias o bloques dicha pregunta
+# se marca como completada en Progreso_ECOA, no vale la pena que sea un store procedure porque solo se ejecuta
+# hasta que se completan todas las preguntas de algun tipo (profesor, materia, bloque) mientras que las respuestas
+# de ecoa se alamcenan cada vez que el alumno responde una pregunta
+
+# Otros querys 3
+# Cada vez que un alumno inicia una encuesta por primera vez se establece el atributo partida_pendiente de 
+# Elementos_de_partida en 1
+
+# =========================================================================================================
+# =========================================================================================================
 
 SELECT Cursa.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF FROM Cursa INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
 GROUP BY Materia.nombre_materia_largo
@@ -433,14 +480,17 @@ WHERE Cursa.alumno_matricula = 'A00228208';
 SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN FROM Cursa
 INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
 WHERE Cursa.alumno_matricula IN (
-	SELECT Cursa.alumno_matricula FROM Cursa INNER JOIN Materia M ON Cursa.CRN = M.CRN WHERE M.nombre_materia_largo = 'Aplicación de la teoría electromagnética'
+	SELECT C.alumno_matricula FROM Cursa C INNER JOIN Materia M ON C.CRN = M.CRN WHERE M.CRN = 41765
 ) ORDER BY Cursa.alumno_matricula;
 
-SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN, count(*) AS total_alumnos FROM Cursa
+# Este query hace lo mismo que el anterior solo que agrupa los resultados por materia e indica
+# el numero de alumnos en cada una
+SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN, count(*) AS total_de_alumnos FROM Cursa
 INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
 WHERE Cursa.alumno_matricula IN (
-	SELECT Cursa.alumno_matricula FROM Cursa INNER JOIN Materia M ON Cursa.CRN = M.CRN WHERE M.nombre_materia_largo = 'Aplicación de la teoría electromagnética'
-) GROUP BY Materia.nombre_materia_largo;
+	SELECT C.alumno_matricula FROM Cursa C INNER JOIN Materia M ON C.CRN = M.CRN WHERE M.CRN = 41765
+) GROUP BY Materia.nombre_materia_largo 
+ORDER BY Cursa.alumno_matricula;
 
 
 SET SQL_SAFE_UPDATES = 0;
@@ -467,7 +517,7 @@ insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) 
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta5", "Los temas vistos en la UdF son aplicables y de valor en la industria:", "Materia", "Cerrada");
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta6", "El bloque se desarrolló de manera coordinada entre los (as) profesores (as):", "Bloque", "Cerrada");
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta7", "Los temas, las actividades y el reto durante el Bloque son aplicables y de valor:", "Bloque", "Cerrada");
-
+insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta8", "El acompañamiento que recibí por parte del profesor fue adecuado:", "Profesor", "Cerrada");
 
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta1");
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta2");
@@ -477,8 +527,11 @@ insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta6");
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta7");
 
+insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s2","pregunta8");
+
 insert into Materias_de_encuesta(clave_encuesta, CRN) values("s1", 31696);
 insert into Materias_de_encuesta(clave_encuesta, CRN) values("s1", 41765);
+insert into Materias_de_encuesta(clave_encuesta, CRN) values("s2", 440);
 
 SELECT * FROM Banco_preguntas_ECOA;
 SELECT * FROM Materias_de_encuesta;
@@ -493,8 +546,17 @@ SET @matricula = 'A00228079';
 
 CALL GetSurvey('A00230099'); 
 
-# "Aplicación de la teoría electromagnética"	41765	L00621869	L00621927
-# "Análisis de circuitos eléctricos de corriente alterna"	31696	L00622354
+# "Aplicación de la teoría electromagnética" (15 alumnos) 41765	L00621869	L00621927 
+# "Análisis de circuitos eléctricos de corriente alterna" (31 alumnos)	31696	L00622354
+# Al obtener todas las demas materias que estudian los alumnos del CRN 41765 se obtiene que 
+# solo 15 estudian el CRN 31696, no se obtendran los 31 alumnos que estudian esta ultima materia
+# porque hay 15 alumnos del grupo 31696 que estudian al mismo tiempo en el grupo 41765 mientras que
+# los otros 16 alumnos del grupo 31696 no estudian al mismo tiempo en el grupo 41765, quizas estudien 
+# en otros grupos y solo hay un alumno que estudia en 41765 y 30634 al mismo tiempo (15 + 15 + 1 = 31)
+
+SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN FROM Cursa
+INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
+WHERE Cursa.CRN = 31696;
 
 # obteniendo todas las materias que estudia el alumno
 SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Cursa.CRN FROM Alumno
@@ -515,3 +577,49 @@ INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
 INNER JOIN Preguntas_de_encuesta ON (Materias_de_encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
 INNER JOIN Banco_preguntas_ECOA ON (Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
 WHERE Alumno.alumno_matricula = @matricula;
+
+# ===================================================================================================
+
+# Alumnos que solo estudian 41765 (0, todos los alumnos de 41765 cursan al mismo tiempo 31696)
+SELECT A.Alumno_matricula, A.nombre_materia_largo, A.tipodeUdF, A.CRN 
+FROM 
+(SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN 
+ FROM Cursa
+ INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
+ WHERE Cursa.CRN = 41765) A
+ LEFT JOIN
+ (SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN 
+ FROM Cursa
+ INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
+ WHERE Cursa.CRN = 31696) B
+ ON (A.Alumno_matricula = B.Alumno_matricula)
+ WHERE B.alumno_matricula IS NULL;
+
+# Alumnos que solo estudian 31696 (16)
+SELECT A.Alumno_matricula, A.nombre_materia_largo, A.tipodeUdF, A.CRN 
+FROM 
+(SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN 
+ FROM Cursa
+ INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
+ WHERE Cursa.CRN = 31696) A
+ LEFT JOIN
+ (SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN 
+ FROM Cursa
+ INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
+ WHERE Cursa.CRN = 41765) B
+ ON (A.Alumno_matricula = B.Alumno_matricula)
+ WHERE B.alumno_matricula IS NULL;
+
+# Alumnos que estudian ambas materias (15)
+SELECT A.Alumno_matricula, A.nombre_materia_largo, A.tipodeUdF, A.CRN 
+FROM 
+(SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN 
+ FROM Cursa
+ INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
+ WHERE Cursa.CRN = 31696) A
+ INNER JOIN
+ (SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN 
+ FROM Cursa
+ INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
+ WHERE Cursa.CRN = 41765) B
+ ON (A.Alumno_matricula = B.Alumno_matricula);
