@@ -301,8 +301,8 @@ BEGIN
 END //
 DELIMITER ;
 
-DELETE FROM Progreso_ECOA;
-DELETE FROM Elementos_de_partida;
+TRUNCATE TABLE Progreso_ECOA;
+TRUNCATE TABLE Elementos_de_partida;
 DROP PROCEDURE setProgresoECOA;
 CALL setProgresoECOA('s1');
            
@@ -314,7 +314,7 @@ SELECT * FROM Elementos_de_partida;
 # Cuando el usuario termina de responder todas las preguntas de una encuesta sus registros de la tabla de ECOA_temporal
 # pasan a la tabla ECOA_definitiva generando el folio y eliminando los registros de ese usuario en ECOA_temporal
 DELIMITER //
-CREATE PROCEDURE mover_respuestas_ECOA(
+CREATE PROCEDURE moveECOA_answers(
 IN matricula VARCHAR(9))
 BEGIN
 	INSERT INTO ECOA_definitiva (clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina)
@@ -330,7 +330,7 @@ DELIMITER ;
 # Cuando el usuario termina cualquier ronda de juego se eliminan sus registros de la tabla Progreso_trivia y se reinician
 # sus registros de la tabla Elementos_de_partida
 DELIMITER //
-CREATE PROCEDURE borrar_registros_de_juego(
+CREATE PROCEDURE deleteGameElements(
 IN matricula VARCHAR(9))
 BEGIN
 	DELETE FROM Progreso_trivia WHERE Progreso_trivia.alumno_matricula = matricula;
@@ -392,9 +392,11 @@ CALL GetTeachersQuestions('A00228079');
 # ---------------------------------------------------------------------------------------------------------
 
 # Store procedures 6
-# Este store procedure devuelve una tabla con todas las preguntas dirigidas a una materia paraa todas las materias
-# que estudia el alumno. Se ejecuta en la plantilla que renderiza el juego solamente si el alumno cursa al 
-# menos una 'Materia'
+# Este store procedure devuelve una tabla con todas las preguntas dirigidas a una materia para todas las materias
+# que estudia el alumno. Se ejecuta en la plantilla que renderiza el juego. No hace falta comprobar si el alumno
+# lleva materias o bloques, puesto que en el peor de los casos requeriria 3 stores procedures (uno para comprobarlo
+# otro para traer las materias y otro para traer los bloques) mientras que ejecutar este y el store procedure para
+# traer los bloques seria como maximo en el peor de los casos 2 stores procedures
 DELIMITER //
 CREATE PROCEDURE GetSubjectsQuestions(
 	IN matricula VARCHAR(9))
@@ -417,7 +419,10 @@ CALL GetSubjectsQuestions('A00228079');
 # Store procedures 7
 # Este store procedure devuelve una tabla con todas las preguntas dirigidas a un bloque o concentracion a todas
 # las UdF de este tipo que estudia el alumno. Se ejecuta en la plantilla que renderiza el juego solamente si el 
-# alumno cursa al menos un 'Bloque' o 'Concentracion'
+# alumno cursa al menos un 'Bloque' o 'Concentracion'. No hace falta comprobar si el alumno lleva materias o bloques, 
+# puesto que en el peor de los casos requeriria 3 stores procedures (uno para comprobarlo otro para traer las materias 
+# y otro para traer los bloques) mientras que ejecutar este y el store procedure para traer las materias seria como 
+# maximo en el peor de los casos 2 stores procedures.
 DELIMITER //
 CREATE PROCEDURE GetCoreSubjectsQuestions(
 	IN matricula VARCHAR(9))
@@ -440,8 +445,27 @@ CALL GetCoreSubjectsQuestions('A00228079');
 # ---------------------------------------------------------------------------------------------------------
 
 # Store procedure 8
-# Cada vez que termina el periodo de ECOAS se eliminan todos los registros de las tablas 
+# Cada vez que termina el periodo de una encuesta se eliminan todos los registros de las tablas 
 # ECOA_temporal, Progreso_ECOA, Elementos_de_partida y Progreso_trivia
+DELIMITER //
+CREATE PROCEDURE finishSurvey()
+BEGIN
+	TRUNCATE TABLE ECOA_temporal;
+	TRUNCATE TABLE Progreso_ECOA;
+    TRUNCATE TABLE Elementos_de_partida;
+	TRUNCATE TABLE Progreso_trivia;
+END //
+DELIMITER ;
+
+drop procedure finishSurvey;
+
+# ---------------------------------------------------------------------------------------------------------
+
+# Store procedure 9
+# Dependiendo del total de preguntas de encuestas se desplegaran n preguntas de la trivia. Este store
+# procedure envia al videojuego n preguntas aleatorias de la trivia donde el numero de preguntas de la
+# trivia a enviar depende del total de preguntas respondidas de la ECOA y se envian preguntas que no se 
+# hayan mostrado previamente en caso de que se haya desconectado
 
 # =========================================================================================================
 # =========================================================================================================
@@ -459,6 +483,11 @@ CALL GetCoreSubjectsQuestions('A00228079');
 # Otros querys 3
 # Cada vez que un alumno inicia una encuesta por primera vez se establece el atributo partida_pendiente de 
 # Elementos_de_partida en 1
+
+# Otros querys 4
+# En la segunda ronda de preguntas cada vez que se muestre una nueva pregunta primero se hace un left join con
+# Progreso_trivia para obtener solo las preguntas que no se hayan mostrado previamente y de ahi tomar una 
+# pregunta aleatoria de ese subquery. Repetir este proceso por cada nueva pregunta a mostrar.
 
 # =========================================================================================================
 # =========================================================================================================
