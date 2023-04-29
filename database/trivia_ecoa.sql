@@ -309,23 +309,23 @@ DELIMITER ;
 # ---------------------------------------------------------------------------------------------------------
 
 # Store procedures 3
-# Este store procedure revisa si hay encuestas disponibles para el alumno, si no hay encuestas disponibles
-# entonces devuelve 0 registros
+# Este store procedure revisa si hay encuestas disponibles para el alumno por materia, si no hay encuestas 
+# disponibles entonces devuelve 0 registros
 DELIMITER //
-CREATE PROCEDURE GetSurvey(
+CREATE PROCEDURE getSurvey(
 	IN matricula VARCHAR(9))
 BEGIN 
-	SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.CRN, Encuesta.clave_encuesta, Encuesta.descripcion, Encuesta.fecha_inicio, Encuesta.fecha_final, Encuesta.activa 
+	SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.CRN 
     FROM Alumno 
 	INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
     INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
-	INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
-	INNER JOIN Encuesta ON (Materias_de_encuesta.clave_encuesta = Encuesta.clave_encuesta)
-	WHERE Alumno.alumno_matricula = matricula AND Encuesta.activa = 1;
+	WHERE Alumno.alumno_matricula = matricula AND Materia.activa = 1;
 END //
 DELIMITER ;
 
-CALL GetSurvey('A00227251');
+CALL getSurvey('A00228079');
+
+DROP PROCEDURE getSurvey;
 
 # ---------------------------------------------------------------------------------------------------------
 
@@ -578,12 +578,7 @@ insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","
 
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s2","pregunta8");
 
-insert into Materias_de_encuesta(clave_encuesta, CRN) values("s1", 31696);
-insert into Materias_de_encuesta(clave_encuesta, CRN) values("s1", 41765);
-insert into Materias_de_encuesta(clave_encuesta, CRN) values("s2", 440);
-
 SELECT * FROM Banco_preguntas_ECOA;
-SELECT * FROM Materias_de_encuesta;
 SELECT * FROM Preguntas_de_encuesta;
 SELECT * FROM Encuesta;
 SELECT * FROM Materia WHERE CRN = 32701;
