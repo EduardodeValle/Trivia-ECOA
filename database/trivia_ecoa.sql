@@ -476,13 +476,16 @@ CALL GetCoreSubjectsQuestions('A00228079');
 
 # Store procedure 7
 # Cada vez que termina el periodo de una encuesta se eliminan todos los registros de las tablas 
-# ECOA_temporal, Progreso_ECOA y Elementos_de_partida
+# ECOA_temporal, Progreso_ECOA y Elementos_de_partida, se desactivan todas las materias que reciben
+# encuestas y se desactiva la encuesta dispoinble.
 DELIMITER //
 CREATE PROCEDURE finishSurvey()
 BEGIN
 	TRUNCATE TABLE ECOA_temporal;
 	TRUNCATE TABLE Progreso_ECOA;
     TRUNCATE TABLE Elementos_de_partida;
+    UPDATE Materia SET activa = 0 WHERE activa = 1;
+    UPDATE Encuesta SET activa = 0 WHERE activa = 1;
 END //
 DELIMITER ;
 
@@ -493,7 +496,8 @@ DELIMITER ;
 # Cuando el alumno responde una pregunta de ecoa se insertan los datos en ECOA_temporal, no vale la pena que sea
 # un store procedure porque solo ejecuta una sola accion que es insertar datos en una sola tabla. Si el tipo de
 # pregunta va dirigida a un profesor entonces el atributo CRN será NULL mientras que si al pregunta va dirigida a
-# una materia o bloque el atributo profesor_nomina sera NULL
+# una materia o bloque el atributo profesor_nomina sera NULL. Se envia en un json todas las respuestas de la ecoa
+# junto con los puntos para establecer 
 
 # Otros querys 2
 # si el alumno termino de responder una pregunta para todos sus profesores, materias o bloques dicha pregunta
@@ -501,18 +505,7 @@ DELIMITER ;
 # hasta que se completan todas las preguntas de algun tipo (profesor, materia, bloque) mientras que las respuestas
 # de ecoa se alamcenan cada vez que el alumno responde una pregunta
 
-# Otros querys 3
-# Cada vez que un alumno inicia una encuesta por primera vez se establece el atributo partida_pendiente de 
-# Elementos_de_partida en 1 y se guarda en una variable global las monedas obtenidas, al completar la 
-# ECOA se agregan los puntos obtenidos mas los que ya tenia el alumno y se ejecuta el store procedure 3
-# para establecer sus nuevas monedas
-
 # Otros querys 4
-# En la segunda ronda de preguntas cada vez que se muestre una nueva pregunta primero se hace un left join con
-# Progreso_trivia para obtener solo las preguntas que no se hayan mostrado previamente y de ahi tomar una 
-# pregunta aleatoria de ese subquery. Repetir este proceso por cada nueva pregunta a mostrar.
-
-# Otros querys 5
 # Cuando un alumno hace una tirada en el gashapon primero se restan los puntos desde unity y al final se actualiza
 # el nuevo valor de monedas con un query
 
