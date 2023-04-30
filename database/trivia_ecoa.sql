@@ -297,15 +297,29 @@ CREATE PROCEDURE moveECOA_answers(
 	IN puntos INT)
 BEGIN
 	INSERT INTO ECOA_definitiva (clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina)
-    SELECT (clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) FROM ECOA_temporal
+    SELECT clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina FROM ECOA_temporal
     WHERE ECOA_temporal.alumno_matricula = matricula;
-    DELETE FROM ECOA_temporal WHERE ECOA_temporal.alumno = matricula;
+    DELETE FROM ECOA_temporal WHERE ECOA_temporal.alumno_matricula = matricula;
     UPDATE Elementos_de_partida SET puntos=0, ronda=2
     WHERE Elementos_de_partida.alumno_matricula = matricula;
-    UPDATE Perfil_juego SET balance_monedas=puntos;
+    UPDATE Perfil_juego SET balance_monedas=puntos
+    WHERE alumno_matricula = matricula;
 END//
 DELIMITER ;
 
+DROP PROCEDURE moveECOA_answers;
+CALL moveECOA_answers('A00230117', 100);
+
+SELECT * FROM ECOA_temporal;
+SELECT * FROM ECOA_definitiva;
+SELECT * FROM Elementos_de_partida WHERE alumno_matricula = 'A00230117'; # puntos = 0; ronda = 1
+SELECT * FROM Perfil_juego WHERE alumno_matricula = 'A00230117'; # balance_monedas = 0
+
+SELECT * FROM Elementos_de_partida;
+SELECT * FROM Perfil_juego;
+
+UPDATE Elementos_de_partida SET ronda = 1 WHERE alumno_matricula = 'A00230117';
+UPDATE Perfil_juego SET balance_monedas = 0 WHERE alumno_matricula = 'A00230117';
 # ---------------------------------------------------------------------------------------------------------
 
 # Store procedures 3
@@ -371,9 +385,10 @@ DELIMITER ;
 # A00228079
 # A00228187
 # A00229540
+# A00230117
 
 DROP PROCEDURE getTeachersQuestions;
-CALL getTeachersQuestions('A00229540');
+CALL getTeachersQuestions('A00230117');
 
 SELECT * FROM Preguntas_de_encuesta;
 SELECT * FROM ECOA_temporal;
@@ -421,9 +436,10 @@ DELIMITER ;
 # A00228079
 # A00228187
 # A00229540
+# A00230117
 
 DROP PROCEDURE getSubjectsQuestions;
-CALL getSubjectsQuestions('A00228079');
+CALL getSubjectsQuestions('A00230117');
 
 # ---------------------------------------------------------------------------------------------------------
 
@@ -469,6 +485,7 @@ DELIMITER ;
 # A00228079
 # A00228187
 # A00229540
+# A00230117
 
 CALL getCoreSubjectsQuestions('A00229540');
 
@@ -727,10 +744,14 @@ insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, resp
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00229540", "s1", "pregunta6", "5", 41765, NULL);
 
 -- A00230117 alumno que ya contesto todas las preguntas de profesores, materias y bloques
-insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta1", 1);
-insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta2", 1);
-insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta3", 1);
-insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta4", 1);
-insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta5", 1);
-insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta6", 1);
-insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta7", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta1", "1", NULL, 'L00622354');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta4", "1", NULL, 'L00622354');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta1", "1", NULL, 'L00621869');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta4", "1", NULL, 'L00621869');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta1", "1", NULL, 'L00621927');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta4", "1", NULL, 'L00621927');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta3", "0", 31696, NULL);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta5", "0", 31696, NULL);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta2", "2", 41765, NULL);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta6", "2", 41765, NULL);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta7", "2", 41765, NULL);
