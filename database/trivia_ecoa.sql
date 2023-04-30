@@ -335,32 +335,33 @@ DROP PROCEDURE getSurvey;
 # store procedure. El primer subquery obtiene todas las preguntas de encuesta para los profesores, el segundo obtiene 
 # las preguntas ya respondidas y se hace un left join para devolver unicamente las preguntas no respondidas
 DELIMITER //
-CREATE PROCEDURE GetTeachersQuestions(
+CREATE PROCEDURE getTeachersQuestions(
 	IN matricula VARCHAR(9))
 BEGIN 
-	SELECT alumno_matricula, nombre_materia_largo, profesor_nomina, profesor_nombre, desripcion
+	SELECT profesores_por_materia.alumno_matricula, profesores_por_materia.nombre_materia_largo, profesores_por_materia.CRN, profesores_por_materia.profesor_nomina, preguntas_profesores.clave_encuesta, preguntas_profesores.clave_pregunta,  preguntas_profesores.descripcion, respuestas_temporales.respuesta
 	FROM (
-			SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Profesor.profesor_nomina, Profesor.nombre, Banco_preguntas_ECOA.descripcion
-			FROM Alumno INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
+			SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.CRN, Profesor.profesor_nomina
+			FROM Alumno
+			INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
 			INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
-			INNER JOIN Imparte ON (Cursa.CRN = Imparte.CRN)
+			INNER JOIN Imparte ON (Materia.CRN = Imparte.CRN)
 			INNER JOIN Profesor ON (Imparte.profesor_nomina = Profesor.profesor_nomina)
-			INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
-			INNER JOIN Encuesta ON (Materias_de_encuesta.clave_encuesta = Encuesta.clave_encuesta)
+			WHERE Alumno.alumno_matricula = matricula AND Materia.activa = 1 ) AS profesores_por_materia
+	CROSS JOIN (
+			SELECT Encuesta.clave_encuesta, Banco_preguntas_ECOA.clave_pregunta,  Banco_preguntas_ECOA.descripcion
+			FROM Encuesta 
 			INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
 			INNER JOIN Banco_preguntas_ECOA ON (Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
-			WHERE Alumno.alumno_matricula = matricula AND Banco_preguntas_ECOA.dirigido_a = 'Profesor'
-		 ) AS preguntas_totales
-	LEFT JOIN
-		(
-			SELECT ECOA_temporal.alumno_matricula, ECOA_temporal.clave_encuesta
-            FROM ECOA_temporal 
-            INNER JOIN Banco_preguntas_ECOA ON (ECOA_temporal.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
-            WHERE ECOA_temporal.alumno_matricula = matricula AND Banco_preguntas_ECOA.dirigido_a = 'Profesor'
-		) AS preguntas_respondidas
-	ON (preguntas_totales.clave_encuesta = preguntas_respondidas.clave_encuesta AND preguntas_totales.alumno_matricula = preguntas_respondidas.alumno_matricula)
-    WHERE preguntas_respondidas.alumno_matricula IS NULL
-    GROUP BY descripcion;
+			WHERE Encuesta.activa = 1 AND Banco_preguntas_ECOA.dirigido_a = 'Profesor' ) AS preguntas_profesores
+	LEFT JOIN (
+			SELECT ECOA_temporal.clave_encuesta, ECOA_temporal.clave_pregunta, ECOA_temporal.alumno_matricula, ECOA_temporal.CRN, ECOA_temporal.profesor_nomina, ECOA_temporal.respuesta
+			FROM Encuesta
+			INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
+			INNER JOIN ECOA_temporal ON (Preguntas_de_encuesta.clave_pregunta = ECOA_temporal.clave_pregunta)
+			WHERE Encuesta.activa = 1) AS respuestas_temporales
+	ON (profesores_por_materia.alumno_matricula = respuestas_temporales.alumno_matricula AND preguntas_profesores.clave_encuesta = respuestas_temporales.clave_encuesta AND preguntas_profesores.clave_pregunta = respuestas_temporales.clave_pregunta AND profesores_por_materia.profesor_nomina = respuestas_temporales.profesor_nomina)
+	WHERE respuestas_temporales.respuesta IS NULL
+	ORDER BY profesores_por_materia.profesor_nomina;
 END //
 DELIMITER ;
 
@@ -368,35 +369,15 @@ DELIMITER ;
 # L00621869
 # L00621927
 # A00228079
+# A00228187
 
-DROP PROCEDURE GetTeachersQuestions;
-CALL GetTeachersQuestions('A00228079');
+DROP PROCEDURE getTeachersQuestions;
+CALL getTeachersQuestions('A00228079');
 
-# posible query a poner en el store procedure
-SELECT preguntas_totales.alumno_matricula, preguntas_totales.nombre_materia_largo, preguntas_totales.profesor_nomina, preguntas_totales.nombre, preguntas_totales.descripcion, preguntas_totales.clave_encuesta, preguntas_totales.clave_pregunta
-	FROM (
-			SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Profesor.profesor_nomina, Profesor.nombre, Banco_preguntas_ECOA.descripcion, Encuesta.clave_encuesta, Banco_preguntas_ECOA.clave_pregunta
-			FROM Alumno INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
-			INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
-			INNER JOIN Imparte ON (Cursa.CRN = Imparte.CRN)
-			INNER JOIN Profesor ON (Imparte.profesor_nomina = Profesor.profesor_nomina)
-			INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
-			INNER JOIN Encuesta ON (Materias_de_encuesta.clave_encuesta = Encuesta.clave_encuesta)
-			INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
-			INNER JOIN Banco_preguntas_ECOA ON (Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
-			WHERE Alumno.alumno_matricula = 'A00228079' AND Banco_preguntas_ECOA.dirigido_a = 'Profesor'
-		 ) AS preguntas_totales
-	LEFT JOIN
-		(
-			SELECT ECOA_temporal.alumno_matricula, ECOA_temporal.clave_encuesta
-            FROM ECOA_temporal 
-            INNER JOIN Banco_preguntas_ECOA ON (ECOA_temporal.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
-            WHERE ECOA_temporal.alumno_matricula = 'A00228079' AND Banco_preguntas_ECOA.dirigido_a = 'Profesor'
-		) AS preguntas_respondidas
-	ON (preguntas_totales.clave_encuesta = preguntas_respondidas.clave_encuesta AND preguntas_totales.alumno_matricula = preguntas_respondidas.alumno_matricula)
-    WHERE preguntas_respondidas.alumno_matricula IS NULL;
-    
+# total_preguntas.alumno_matricula = respuestas_temporales.alumno_matricula AND total_preguntas.clave_encuesta = respuestas_temporales.clave_encuesta AND total_preguntas.clave_pregunta = respuestas_temporales.clave_pregunta AND total_preguntas.profesor_nomina = respuestas_temporales.profesor_nomina AND total_preguntas.CRN = respuestas_temporales.CRN
+
 SELECT * FROM Preguntas_de_encuesta;
+SELECT * FROM ECOA_temporal;
     
 # ---------------------------------------------------------------------------------------------------------
 
@@ -509,6 +490,8 @@ DELIMITER ;
 # Cuando un alumno hace una tirada en el gashapon primero se restan los puntos desde unity y al final se actualiza
 # el nuevo valor de monedas con un query
 
+
+
 # =========================================================================================================
 # =========================================================================================================
 
@@ -588,6 +571,8 @@ SET @matricula = 'A00228079';
 # Alumno que estudia una materia que no aplica encuesta (0 encuestas) A01620861
 # Alumno que estudia 3 materias al mismo tiempo pero solo tieneencuesta de 2 materias: A00230099
 
+
+
 CALL GetSurvey('A00230099'); 
 
 # "Aplicación de la teoría electromagnética" (15 alumnos) 41765	L00621869	L00621927 
@@ -641,7 +626,7 @@ FROM
  WHERE B.alumno_matricula IS NULL;
 
 # Alumnos que solo estudian 31696 (16)
-SELECT A.Alumno_matricula, A.nombre_materia_largo, A.tipodeUdF, A.CRN 
+SELECT A.Alumno_matricula, A.nombre_materia_largo, A.tipodeUdF, A.CRN, B.alumno_matricula
 FROM 
 (SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN 
  FROM Cursa
@@ -668,3 +653,61 @@ FROM
  INNER JOIN Materia ON (Cursa.CRN = Materia.CRN) 
  WHERE Cursa.CRN = 41765) B
  ON (A.Alumno_matricula = B.Alumno_matricula);
+ 
+ 
+ 
+ 
+# 31696
+# 41765
+SELECT * FROM Banco_preguntas_ECOA;
+SELECT * FROM Preguntas_de_encuesta;
+SELECT * FROM Encuesta;
+SELECT * FROM Materia WHERE CRN = 32701;
+SET @matricula = 'A00228079'; 
+
+# obteniendo todos los profesores que imparten una materia
+SELECT * FROM Materia 
+INNER JOIN Imparte ON (Materia.CRN = Imparte.CRN)
+INNER JOIN Profesor ON (Imparte.profesor_nomina = Profesor.profesor_nomina)
+WHERE Materia.CRN = 41765;
+
+CALL getSurvey('A00228079');
+
+SELECT * FROM ECOA_temporal;
+ 
+
+ -- A00228079 alumno que no ha terminado todas las preguntas de profesores, faltan las preguntas de materias y bloques
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228079", "s1", "pregunta1", "8", NULL, 'L00622354');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228079", "s1", "pregunta4", "10", NULL, 'L00622354');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228079", "s1", "pregunta1", "5", NULL, 'L00621927');
+
+-- A00228187 alumno que ha contestado todas las preguntas de profesores pero no todas de las materias, faltan todas del bloque
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta1", "1", NULL, 'L00622354');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta4", "2", NULL, 'L00622354');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta1", "3", NULL, 'L00621869');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta4", "4", NULL, 'L00621869');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta1", "5", NULL, 'L00621927');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta4", "6", NULL, 'L00621927');
+
+-- A00229540 alumno que ha contestado todas las de profesores, todas materias y algunas de bloques
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00229540", "s1", "pregunta1", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00229540", "s1", "pregunta2", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00229540", "s1", "pregunta3", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00229540", "s1", "pregunta4", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00229540", "s1", "pregunta5", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00229540", "s1", "pregunta6", 0);
+
+-- A00230117 alumno que ya contesto todas las preguntas de profesores, materias y bloques
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta1", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta2", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta3", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta4", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta5", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta6", 1);
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta7", 1);
+
+-- Las personas que no las tienen todas contestadas tienen un signo de pregunta y la clave_pregunta es donde se quedaron
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228079", "s1", "pregunta4", "Si?", "31696", "L00622354");
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta5", "Si?", "31696", "L00622354");
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00229540", "s1", "pregunta6", "Si?", "31696", "L00622354");
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta7", "Si", "31696", "L00622354");
