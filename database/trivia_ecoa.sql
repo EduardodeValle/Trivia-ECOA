@@ -348,7 +348,7 @@ BEGIN
 			INNER JOIN Profesor ON (Imparte.profesor_nomina = Profesor.profesor_nomina)
 			WHERE Alumno.alumno_matricula = matricula AND Materia.activa = 1 ) AS profesores_por_materia
 	CROSS JOIN (
-			SELECT Encuesta.clave_encuesta, Banco_preguntas_ECOA.clave_pregunta,  Banco_preguntas_ECOA.descripcion
+			SELECT Encuesta.clave_encuesta, Banco_preguntas_ECOA.clave_pregunta, Banco_preguntas_ECOA.descripcion
 			FROM Encuesta 
 			INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
 			INNER JOIN Banco_preguntas_ECOA ON (Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
@@ -371,10 +371,7 @@ DELIMITER ;
 # A00228079
 # A00228187
 
-DROP PROCEDURE getTeachersQuestions;
 CALL getTeachersQuestions('A00228079');
-
-# total_preguntas.alumno_matricula = respuestas_temporales.alumno_matricula AND total_preguntas.clave_encuesta = respuestas_temporales.clave_encuesta AND total_preguntas.clave_pregunta = respuestas_temporales.clave_pregunta AND total_preguntas.profesor_nomina = respuestas_temporales.profesor_nomina AND total_preguntas.CRN = respuestas_temporales.CRN
 
 SELECT * FROM Preguntas_de_encuesta;
 SELECT * FROM ECOA_temporal;
@@ -388,42 +385,35 @@ SELECT * FROM ECOA_temporal;
 # otro para traer las materias y otro para traer los bloques) mientras que ejecutar este y el store procedure para
 # traer los bloques seria como maximo en el peor de los casos 2 stores procedures
 DELIMITER //
-CREATE PROCEDURE GetSubjectsQuestions(
+CREATE PROCEDURE getSubjectsQuestions(
 	IN matricula VARCHAR(9))
 BEGIN 
-	SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Banco_preguntas_ECOA.descripcion
-	FROM Alumno INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
-	INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
-	INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
-	INNER JOIN Encuesta ON (Materias_de_encuesta.clave_encuesta = Encuesta.clave_encuesta)
-	INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
-	INNER JOIN Banco_preguntas_ECOA ON (Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
-	WHERE Alumno.alumno_matricula = matricula AND Materia.tipodeUdF = 'Materia' AND Banco_preguntas_ECOA.dirigido_a = 'Materia';
+	SELECT materias_unicas.alumno_matricula, materias_unicas.nombre_materia_largo, materias_unicas.CRN, preguntas_materias.clave_encuesta, preguntas_materias.clave_pregunta,  preguntas_materias.descripcion, respuestas_temporales.respuesta
+	FROM (
+			SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.CRN
+			FROM Alumno
+			INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
+			INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
+			WHERE Alumno.alumno_matricula = matricula AND Materia.activa = 1 ) AS materias_unicas
+	CROSS JOIN (
+			SELECT Encuesta.clave_encuesta, Banco_preguntas_ECOA.clave_pregunta, Banco_preguntas_ECOA.descripcion
+			FROM Encuesta 
+			INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
+			INNER JOIN Banco_preguntas_ECOA ON (Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
+			WHERE Encuesta.activa = 1 AND Banco_preguntas_ECOA.dirigido_a = 'Materia' ) AS preguntas_materias
+	LEFT JOIN (
+				SELECT ECOA_temporal.clave_encuesta, ECOA_temporal.clave_pregunta, ECOA_temporal.alumno_matricula, ECOA_temporal.CRN, ECOA_temporal.profesor_nomina, ECOA_temporal.respuesta
+				FROM Encuesta
+				INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
+				INNER JOIN ECOA_temporal ON (Preguntas_de_encuesta.clave_pregunta = ECOA_temporal.clave_pregunta)
+				WHERE Encuesta.activa = 1) AS respuestas_temporales
+	ON (materias_unicas.alumno_matricula = respuestas_temporales.alumno_matricula AND preguntas_materias.clave_encuesta = respuestas_temporales.clave_encuesta AND preguntas_materias.clave_pregunta = respuestas_temporales.clave_pregunta AND materias_unicas.CRN = respuestas_temporales.CRN)
+	WHERE respuestas_temporales.respuesta IS NULL
+	ORDER BY materias_unicas.CRN;
 END //
 DELIMITER ;
 
-CALL GetSubjectsQuestions('A00228079');
-
-SELECT * 
-FROM (
-		SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Banco_preguntas_ECOA.descripcion
-		FROM Alumno INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula)
-		INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
-		INNER JOIN Materias_de_encuesta ON (Cursa.CRN = Materias_de_encuesta.CRN)
-		JOIN Encuesta ON (Materias_de_encuesta.clave_encuesta = Encuesta.clave_encuesta)
-		INNER JOIN Preguntas_de_encuesta ON (Encuesta.clave_encuesta = Preguntas_de_encuesta.clave_encuesta)
-		INNER JOIN Banco_preguntas_ECOA ON (Preguntas_de_encuesta.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
-		WHERE Alumno.alumno_matricula = 'A00228079' AND Materia.tipodeUdF = 'Materia' AND Banco_preguntas_ECOA.dirigido_a = 'Materia'
-	 ) AS preguntas_totales
-LEFT JOIN
-	 (
-		SELECT ECOA_temporal.alumno_matricula, ECOA_temporal.clave_encuesta
-		FROM ECOA_temporal 
-		INNER JOIN Banco_preguntas_ECOA ON (ECOA_temporal.clave_pregunta = Banco_preguntas_ECOA.clave_pregunta)
-		WHERE ECOA_temporal.alumno_matricula = 'A00228079' AND Banco_preguntas_ECOA.dirigido_a = 'Materia'
-     ) AS preguntas_respondidas
-     ON (preguntas_totales.clave_encuesta = preguntas_respondidas.clave_encuesta AND preguntas_totales.alumno_matricula = preguntas_respondidas.alumno_matricula)
-     WHERE preguntas_respondidas.alumno_matricula IS NULL;
+CALL getSubjectsQuestions('A00228187');
 
 # ---------------------------------------------------------------------------------------------------------
 
@@ -515,6 +505,9 @@ WHERE Cursa.alumno_matricula IN (
 	SELECT C.alumno_matricula FROM Cursa C INNER JOIN Materia M ON C.CRN = M.CRN WHERE M.CRN = 41765
 ) ORDER BY Cursa.alumno_matricula;
 
+# 31696
+# 41765
+
 # Este query hace lo mismo que el anterior solo que agrupa los resultados por materia e indica
 # el numero de alumnos en cada una
 SELECT Cursa.Alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Materia.CRN, count(*) AS total_de_alumnos FROM Cursa
@@ -591,7 +584,7 @@ WHERE Cursa.CRN = 31696;
 SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Cursa.CRN FROM Alumno
 INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula) 
 INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
-WHERE Alumno.alumno_matricula = 'A00230117';
+WHERE Alumno.alumno_matricula = 'A00230099';
 # A00228079 A00228187 A00229540 A00230117
 
 # obteniendo todos los profesores que imparten una materia
@@ -688,6 +681,7 @@ insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, resp
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta4", "4", NULL, 'L00621869');
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta1", "5", NULL, 'L00621927');
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta4", "6", NULL, 'L00621927');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00228187", "s1", "pregunta3", "10", 31696, NULL);
 
 -- A00229540 alumno que ha contestado todas las de profesores, todas materias y algunas de bloques
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00229540", "s1", "pregunta1", 1);
