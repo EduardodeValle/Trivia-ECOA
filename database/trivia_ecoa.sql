@@ -498,13 +498,30 @@ CALL getCoreSubjectsQuestions('A00229540');
 DELIMITER //
 CREATE PROCEDURE finishSurvey()
 BEGIN
+	SET SQL_SAFE_UPDATES = 0;
 	TRUNCATE TABLE ECOA_temporal;
 	TRUNCATE TABLE Progreso_ECOA;
     TRUNCATE TABLE Elementos_de_partida;
     UPDATE Materia SET activa = 0 WHERE activa = 1;
     UPDATE Encuesta SET activa = 0 WHERE activa = 1;
+    SET SQL_SAFE_UPDATES = 1;
 END //
 DELIMITER ;
+
+DROP PROCEDURE finishSurvey;
+CALL finishSurvey();
+
+SELECT * FROM ECOA_temporal;
+SELECT * FROM Progreso_ECOA;
+SELECT * FROM ELementos_de_partida;
+SELECT * FROM Materia WHERE Materia.activa = 1;
+SELECT * FROM Encuesta;
+
+UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = "s1";
+UPDATE Materia SET activa = 1 WHERE CRN = 41765;
+UPDATE Materia SET activa = 1 WHERE CRN = 31696;
+CALL setProgresoECOA();
+
 
 # =========================================================================================================
 # =========================================================================================================
