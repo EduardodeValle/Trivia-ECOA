@@ -10,6 +10,8 @@ import Preguntas from './pages/Preguntas.jsx'
 import Encuestas from './pages/Encuestas.jsx';
 import Activar from './pages/Activar.jsx';
 import NotFound from './pages/NotFound.jsx'
+import UserContext from './context/UserContext.jsx'
+import React, {useState} from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -32,4 +34,14 @@ function App() {
   )
 }
 
-export default App
+function AppWithContext() {
+  const [msg, setMsg] = React.useState('Mensaje por defecto');
+  
+  return (
+    <UserContext.Provider value={{ msg, setMsg }}>
+      <App />
+    </UserContext.Provider>
+  );
+}
+
+export default AppWithContext;

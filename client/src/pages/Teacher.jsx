@@ -1,15 +1,14 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, {useContext} from 'react';
+import UserContext from '../context/UserContext.jsx'
 import './Teacher.css';
 
 function Teacher() {
-  const location = useLocation();
-  const welcomeText = location.state.welcomeText;
+  const { msg } = useContext(UserContext);
 
   return (
     <div className="teacher-container">
       <h1 className="teacher-header">Sistema de Encuestas</h1>
-      <h2>{welcomeText}</h2>
+      <h2>{msg}</h2>
       <div className="teacher-main">
         <div className="teacher-top-section">
           <div className="teacher-section">

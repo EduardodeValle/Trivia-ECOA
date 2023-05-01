@@ -1,17 +1,16 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, {useContext} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './StudentSurvey.css';
+import UserContext from '../context/UserContext.jsx'
 
 // las propiedades del videojuego estan en el tag <iframe>, el videojuego se encuentra en el frame contenedor
 
 function StudentSurvey() {
-  const location = useLocation();
-  const welcomeText = location.state.welcomeText;
+  const { msg } = useContext(UserContext);
 
   return (
     <div className="container student-container">
-      <h1 className="text-center mb-4">{welcomeText}</h1>
+      <h1 className="text-center mb-4">{msg}</h1>
       <h5 className="text-center text-blue mb-4">¡Juega la Trivia y Gana Premios!</h5>
       <div className="row justify-content-center">
         <div className="col-md-8">

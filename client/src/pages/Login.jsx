@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RequestLogin, RequestStudentSurvey } from '../api/tasks.api.js'
+import UserContext from '../context/UserContext.jsx'
 import './Login.css';
 
 
@@ -8,6 +9,7 @@ function Login() {
   const [id_usuario, setid_usuario] = useState('');
   const [contrasenia, setPassword] = useState('');
   const navigate = useNavigate();
+  const { msg, setMsg } = useContext(UserContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -18,16 +20,18 @@ function Login() {
     const response_login = await RequestLogin(credentials);
     if (response_login.data.success) {
       const msg = 'Bienvenido ' + response_login.data.nombre;
+      setMsg(msg);
+      console.log(msg);
       if (response_login.data.ocupacion === 'Alumno') { 
         const response_survey = await RequestStudentSurvey({ "alumno_matricula": id_usuario });
         console.log("===================================================")
         console.log("El alumno tiene encuestas en " + response_survey.data.length + " materias");
         console.log("===================================================")
         if (response_survey.data.length === 0) { navigate('/student'); }
-        else { navigate('/student-survey', { state: { welcomeText: msg } });  }
+        else { navigate('/student-survey');  }
       }
-      else if (response_login.data.ocupacion === 'Profesor') { navigate('/teacher', { state: { welcomeText: msg } } ); }
-      else if (response_login.data.ocupacion === 'Colaborador' || response_login.data.ocupacion === 'ProfesorColaborador') { navigate('/admin', { state: { welcomeText: msg } } ); }
+      else if (response_login.data.ocupacion === 'Profesor') { navigate('/teacher'); }
+      else if (response_login.data.ocupacion === 'Colaborador' || response_login.data.ocupacion === 'ProfesorColaborador') { navigate('/admin'); }
     } else {
       console.log('Credenciales incorrectas, por favor intente de nuevo.');
     }

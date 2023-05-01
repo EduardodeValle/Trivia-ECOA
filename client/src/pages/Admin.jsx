@@ -1,12 +1,12 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import './Admin.css';
 import Button from '@mui/material/Button/index.js';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import UserContext from '../context/UserContext.jsx'
 
 function Admin() {
 
-  const location = useLocation();
-  const welcomeText = location.state.welcomeText;
+  const { msg } = useContext(UserContext);
 
   const navigate = useNavigate();
   const handleIngresarPreguntas = () => {
@@ -21,7 +21,7 @@ function Admin() {
 
   return (
     <div className="admin-container">
-      <h1 className="admin-header">{welcomeText}</h1>
+      <h1 className="admin-header">{msg}</h1>
       <div className="admin-main">
         <div className="admin-left-section">
           <h2>Generador de Encuestas</h2>
