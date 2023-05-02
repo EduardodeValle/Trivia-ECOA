@@ -23,11 +23,21 @@ function Preguntas() {
 
   const { preguntas } = useContext(UserContext);
 
-  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption1, setSelectedOption1] = useState("");
+  const [selectedOption2, setSelectedOption2] = useState("");
+  const [selectedOption3, setSelectedOption3] = useState("");
 
-  const handleSelectChange = (event) => {
-    setSelectedOption(event.target.value);
-  }
+  const handleSelectChange1 = (event) => {
+    setSelectedOption1(event.target.value);
+  };
+
+  const handleSelectChange2 = (event) => {
+    setSelectedOption2(event.target.value);
+  };
+
+  const handleSelectChange3 = (event) => {
+    setSelectedOption2(event.target.value);
+  };
 
   const MenuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion }));
   //const menuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.clave_pregunta }));
@@ -87,8 +97,8 @@ function Preguntas() {
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Pregunta"
-                    value={selectedOption}
-                    onChange={handleSelectChange}
+                    value={selectedOption1}
+                    onChange={handleSelectChange1}
                   >
                     {MenuItems.map(menuItem => (
                       <MenuItem key={menuItem.value} value={menuItem.value}>
@@ -99,7 +109,7 @@ function Preguntas() {
                 </FormControl>
               </p>
               <p className="archivar-text1">
-                <TextField fullWidth label={selectedOption ? MenuItems.find(item => item.value === selectedOption).label : ""} id="Descripción" />
+                <TextField fullWidth label={selectedOption1 ? MenuItems.find(item => item.value === selectedOption1).label : ""} id="Descripciónnnnnnn" />
               </p>
               <p className="bajas-text2">
                 <Button variant="contained">Archivar</Button>
@@ -114,15 +124,19 @@ function Preguntas() {
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Pregunta"
+                    value={selectedOption2}
+                    onChange={handleSelectChange2}
                   >
-                    <MenuItem>Pregunta 1</MenuItem>
-                    <MenuItem>Pregunta 2</MenuItem>
-                    <MenuItem>Pregunta 3</MenuItem>
+                    {MenuItems.map(menuItem => (
+                      <MenuItem key={menuItem.value} value={menuItem.value}>
+                        {menuItem.value}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </p>
               <p className="archivar-text1">
-                <TextField fullWidth label="Descripción" id="Descripción" />
+                <TextField fullWidth label={selectedOption2 ? MenuItems.find(item => item.value === selectedOption2).label : ""} id="Descripcion_2" />
               </p>
               <p className="bajas-text2">
                 <Button variant="contained">Archivar</Button>

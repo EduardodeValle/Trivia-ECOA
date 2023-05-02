@@ -522,7 +522,6 @@ UPDATE Materia SET activa = 1 WHERE CRN = 41765;
 UPDATE Materia SET activa = 1 WHERE CRN = 31696;
 CALL setProgresoECOA();
 
-
 # =========================================================================================================
 # =========================================================================================================
 
@@ -543,6 +542,38 @@ CALL setProgresoECOA();
 # Cuando un alumno hace una tirada en el gashapon primero se restan los puntos desde unity y al final se actualiza
 # el nuevo valor de monedas con un query
 
+SELECT * FROM Materia WHERE activa = 1;
+UPDATE Materia SET activa = 1 WHERE CRN = 15073;
+
+# Alumnos que cursan la materia
+SELECT Cursa.alumno_matricula, Materia.nombre_materia_largo, Materia.clave_materia FROM Cursa 
+INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
+WHERE Materia.CRN = 15073;
+
+# Profesores que imparten la materia
+SELECT Imparte.profesor_nomina, Materia.nombre_materia_largo, Materia.clave_materia FROM Imparte 
+INNER JOIN Materia ON (Imparte.CRN = Materia.CRN)
+WHERE Materia.CRN = 15073;
+
+UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = "s1";
+
+SELECT * FROM Encuesta;
+SELECT * FROM Preguntas_de_encuesta;
+SELECT * FROM Banco_preguntas_ECOA;
+SELECT * FROM ECOA_temporal;
+
+SELECT * FROM Progreso_ECOA;
+SELECT * FROM Elementos_de_partida;
+TRUNCATE TABLE ECOA_temporal;
+TRUNCATE TABLE Progreso_ECOA;
+TRUNCATE TABLE Elementos_de_partida;
+
+CALL setProgresoECOA();						# crear registros de videojuegos de los alumnos que reciben encuesta
+CALL getSurvey('A00242489'); 				# ver si el alumno actual tiene encuesta disponible
+CALL getTeachersQuestions('A00242489'); 	# otener preguntas faltantes de profesores de todas las materias
+CALL getSubjectsQuestions('A00242489');  	# obtener preguntas faltantes de las materias que cursa el alumno	    
+CALL getCoreSubjectsQuestions('A00242489'); # obtener preguntas faltantes de los bloques que cursa el alumno
+CALL finishSurvey();						# eliminar preguntas sin terminar, desactivar encuesta y materias al finalizar periodo
 
 
 # =========================================================================================================
