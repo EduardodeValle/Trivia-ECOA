@@ -56,8 +56,40 @@ export const getStudentSurvey = async (req, res) => {
 export const getSurveys = async (req, res) => {
     try {
         const [result] = await pool.query("SELECT * FROM Encuesta;");
-        console.log(result);
-        res.json(result[0]);
+        res.json(result);
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const getQuestions = async (req, res) => {
+    try {
+        const [result] = await pool.query("SELECT * FROM Banco_preguntas_ECOA;");
+        console.log(result)
+        res.json(result);
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const activateSurvey = async (req, res) => {
+    try {
+        const { clave_encuesta } = req.body;
+        console.log("backend 1: " + clave_encuesta);
+        const [result] = await pool.query("UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = ?;", [clave_encuesta]);
+        console.log("backend 2: " + clave_encuesta);
+        res.sendStatus(200);
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const finishSurvey = async (req, res) => {
+    try {
+        const [result] = await pool.query("CALL finishSurvey();");
     } catch (error) {
         console.log(error.message);
         return res.status(500).json({ message: error.message })

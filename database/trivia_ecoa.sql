@@ -647,7 +647,7 @@ WHERE Cursa.CRN = 31696;
 SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Cursa.CRN FROM Alumno
 INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula) 
 INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
-WHERE Alumno.alumno_matricula = 'A00230099';
+WHERE Alumno.alumno_matricula = 'A01620860';
 # A00228079 A00228187 A00229540 A00230117
 
 # obteniendo todos los profesores que imparten una materia
@@ -727,7 +727,7 @@ INNER JOIN Imparte ON (Materia.CRN = Imparte.CRN)
 INNER JOIN Profesor ON (Imparte.profesor_nomina = Profesor.profesor_nomina)
 WHERE Materia.CRN = 41765;
 
-CALL getSurvey('A00228079');
+CALL getSurvey('A01620860');
 
 SELECT * FROM ECOA_temporal;
 SELECT * FROM Preguntas_de_encuesta
@@ -772,3 +772,6 @@ insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, resp
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta2", "2", 41765, NULL);
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta6", "2", 41765, NULL);
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta7", "2", 41765, NULL);
+
+UPDATE Encuesta SET fecha_inicio = '2023-04-28', fecha_final = '2023-05-01', activa = 0 WHERE clave_encuesta = "s1";
+SELECT * FROM Encuesta;

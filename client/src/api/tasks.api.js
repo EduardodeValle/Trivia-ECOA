@@ -8,3 +8,6 @@ export const RequestStudentSurvey = async (matricula) =>
 
 export const RequestSurveys = async () =>
     await axios.get('http://localhost:4000/getSurveys')
+
+export const RequestQuestions = async () =>
+    await axios.get('http://localhost:4000/getQuestions')
