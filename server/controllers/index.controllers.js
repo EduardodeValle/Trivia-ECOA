@@ -77,9 +77,7 @@ export const getQuestions = async (req, res) => {
 export const activateSurvey = async (req, res) => {
     try {
         const { clave_encuesta } = req.body;
-        console.log("backend 1: " + clave_encuesta);
         const [result] = await pool.query("UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = ?;", [clave_encuesta]);
-        console.log("backend 2: " + clave_encuesta);
         res.sendStatus(200);
     } catch (error) {
         console.log(error.message);
@@ -90,6 +88,7 @@ export const activateSurvey = async (req, res) => {
 export const finishSurvey = async (req, res) => {
     try {
         const [result] = await pool.query("CALL finishSurvey();");
+        res.sendStatus(200);
     } catch (error) {
         console.log(error.message);
         return res.status(500).json({ message: error.message })

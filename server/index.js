@@ -18,7 +18,7 @@ app.listen(PORT);
 console.log(`Server is listening on port ${PORT}`);
 
 //                     'minuto hora * * *'
-const job = new CronJob('57 1 * * *', async function () {
+const job = new CronJob('07 2 * * *', async function () {
     console.log('Esta tarea se ejecutará todos los días a las 00:00 horas');
 
     try {
@@ -30,13 +30,17 @@ const job = new CronJob('57 1 * * *', async function () {
             console.log(survey.clave_encuesta);
             const fecha_inicio_encuesta = survey.fecha_inicio.slice(0, 10);
             const fecha_final_encuesta = survey.fecha_final.slice(0, 10);
-            if ((fecha_actual >= fecha_inicio_encuesta) && (fecha_actual <= fecha_final_encuesta) && (survey.activa === 0)) { 
+            if ((fecha_actual >= fecha_inicio_encuesta) && (fecha_actual <= fecha_final_encuesta) && (survey.activa === 0)) { // si la fecha actual esta en un periodo de encuestas hay que activar la encuesta respectiva
                 console.log("Se encontro que la encuesta " + survey.clave_encuesta + " debe activarse");
                 const response = await axios.post('http://localhost:4000/activateSurvey', { clave_encuesta: survey.clave_encuesta }); // se debe activar la encuesta
                 console.log("Activada la encuesta " + survey.clave_encuesta + " exitosamente");
                 break; // ya no hay mas encuestas por activar
             } 
-            else if ((fecha_actual > fecha_final_encuesta) && (survey.activa === 1)) { const response = await axios.get('http://localhost:4000/finishSurvey'); } // se ejecuta el store procedure finishSurvey()
+            else if ((fecha_actual > fecha_final_encuesta) && (survey.activa === 1)) { // si la encuesta actual esta activa y la fecha actual supera la fecha final de aplicacion entonces se debe desactivar la encuesta, las materias, borrar los registros temporales de ecoa y perfiles de juego
+                const response = await axios.get('http://localhost:4000/finishSurvey'); 
+                console.log("Datos eliminados exitosamente");
+                // el bucle no termina porque podria haber otra encuesta seguida de la anterior
+            } 
         }
     } catch (error) {
         console.error(error);

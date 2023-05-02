@@ -773,5 +773,6 @@ insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, resp
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta6", "2", 41765, NULL);
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00230117", "s1", "pregunta7", "2", 41765, NULL);
 
-UPDATE Encuesta SET fecha_inicio = '2023-04-28', fecha_final = '2023-05-01', activa = 0 WHERE clave_encuesta = "s1";
+UPDATE Encuesta SET fecha_inicio = '2023-05-01', fecha_final = '2023-05-03', activa = 0 WHERE clave_encuesta = "s1";
+UPDATE Encuesta SET fecha_inicio = '2023-04-28', fecha_final = '2023-05-01', activa = 1 WHERE clave_encuesta = "s1";
 SELECT * FROM Encuesta;
