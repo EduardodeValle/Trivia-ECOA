@@ -1,6 +1,6 @@
 import './Student.css';
 import {useContext} from 'react'
-import UserContext from '../context/UserContext.jsx'
+import { UserContext } from '../context/UserContext.jsx'
 
 function Student() {
     const { msg } = useContext(UserContext);

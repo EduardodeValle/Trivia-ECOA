@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './StudentSurvey.css';
-import UserContext from '../context/UserContext.jsx'
+import { UserContext }  from '../context/UserContext.jsx'
 
 // las propiedades del videojuego estan en el tag <iframe>, el videojuego se encuentra en el frame contenedor
 

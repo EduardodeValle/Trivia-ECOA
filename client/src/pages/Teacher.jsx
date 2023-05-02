@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import UserContext from '../context/UserContext.jsx'
+import { UserContext } from '../context/UserContext.jsx'
 import './Teacher.css';
 
 function Teacher() {

@@ -2,11 +2,20 @@ import React, {useContext} from 'react';
 import './Admin.css';
 import Button from '@mui/material/Button/index.js';
 import { useNavigate } from 'react-router-dom';
-import UserContext from '../context/UserContext.jsx'
+import { UserContext } from '../context/UserContext.jsx'
 
 function Admin() {
 
-  const { msg } = useContext(UserContext);
+  const { msg, preguntas, encuestas } = useContext(UserContext);
+
+  console.log("===================================================");
+  console.log(msg);
+  console.log("===================================================");
+  console.log(preguntas);
+  console.log("===================================================");
+  console.log(encuestas);
+  console.log("===================================================");
+
 
   const navigate = useNavigate();
   const handleIngresarPreguntas = () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import './Preguntas.css';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -11,8 +11,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
+import { UserContext } from '../context/UserContext.jsx'
 import { useNavigate } from 'react-router-dom';
-import { RequestQuestions } from '../api/tasks.api.js'
 
 function Preguntas() {
 
@@ -21,7 +21,15 @@ function Preguntas() {
     navigate('/admin');
   };
 
-  //const newMenuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion }));
+  const { preguntas } = useContext(UserContext);
+
+  const [selectedOption, setSelectedOption] = useState('');
+
+  const handleSelectChange = (event) => {
+    setSelectedOption(event.target.value);
+  }
+
+  const MenuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion }));
   //const menuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.clave_pregunta }));
 
   //console.log(preguntas.data);
@@ -79,15 +87,19 @@ function Preguntas() {
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
                     label="Pregunta"
+                    value={selectedOption}
+                    onChange={handleSelectChange}
                   >
-                    <MenuItem>Pregunta 1</MenuItem>
-                    <MenuItem>Pregunta 2</MenuItem>
-                    <MenuItem>Pregunta 3</MenuItem>
+                    {MenuItems.map(menuItem => (
+                      <MenuItem key={menuItem.value} value={menuItem.value}>
+                        {menuItem.value}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </p>
               <p className="archivar-text1">
-                <TextField fullWidth label="Descripción" id="Descripción" />
+                <TextField fullWidth label={selectedOption ? MenuItems.find(item => item.value === selectedOption).label : ""} id="Descripción" />
               </p>
               <p className="bajas-text2">
                 <Button variant="contained">Archivar</Button>

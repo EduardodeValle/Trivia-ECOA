@@ -1,5 +1,26 @@
-import React from 'react';
+import React, {createContext, useState} from 'react';
 
-const UserContext = React.createContext('');
+const UserContext = createContext();
 
-export default UserContext;
+const UserProvider = (props) => {
+    const [msg, setMSG] = useState('');
+    const [preguntas, setPreguntas] = useState([]);
+    const [encuestas, setEncuestas] = useState([]);
+  
+    return (
+      <MyContext.Provider
+        value={{
+          msg,
+          setMSG,
+          preguntas,
+          setPreguntas,
+          encuestas,
+          setEncuestas
+        }}
+      >
+        {props.children}
+      </MyContext.Provider>
+    );
+};
+  
+export { UserContext, UserProvider };

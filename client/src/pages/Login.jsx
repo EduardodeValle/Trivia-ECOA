@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RequestLogin, RequestStudentSurvey } from '../api/tasks.api.js'
-import UserContext from '../context/UserContext.jsx'
+import { RequestLogin, RequestStudentSurvey, RequestQuestions, RequestSurveys } from '../api/tasks.api.js'
+import { UserContext } from '../context/UserContext.jsx'
 import './Login.css';
 
 
@@ -9,7 +9,7 @@ function Login() {
   const [id_usuario, setid_usuario] = useState('');
   const [contrasenia, setPassword] = useState('');
   const navigate = useNavigate();
-  const { msg, setMsg } = useContext(UserContext);
+  const { msg, setMSG, preguntas, setPreguntas, encuestas, setEncuestas } = useContext(UserContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,9 +19,8 @@ function Login() {
     };
     const response_login = await RequestLogin(credentials);
     if (response_login.data.success) {
-      const msg = 'Bienvenido ' + response_login.data.nombre;
-      setMsg(msg);
-      console.log(msg);
+      const message = 'Bienvenido ' + response_login.data.nombre;
+      setMSG(message);
       if (response_login.data.ocupacion === 'Alumno') { 
         const response_survey = await RequestStudentSurvey({ "alumno_matricula": id_usuario });
         console.log("===================================================")
@@ -31,7 +30,18 @@ function Login() {
         else { navigate('/student-survey');  }
       }
       else if (response_login.data.ocupacion === 'Profesor') { navigate('/teacher'); }
-      else if (response_login.data.ocupacion === 'Colaborador' || response_login.data.ocupacion === 'ProfesorColaborador') { navigate('/admin'); }
+      else if (response_login.data.ocupacion === 'Colaborador' || response_login.data.ocupacion === 'ProfesorColaborador') { 
+        const questions_response = await RequestQuestions();
+        const surveys_response = await RequestSurveys();
+        setPreguntas(questions_response.data);
+        setEncuestas(surveys_response.data);
+        //console.log("===============================================");
+        //console.log(preguntas)
+        //console.log("===============================================");
+        //console.log(encuestas)
+        //console.log("===============================================");
+        navigate('/admin'); 
+      }
     } else {
       console.log('Credenciales incorrectas, por favor intente de nuevo.');
     }
