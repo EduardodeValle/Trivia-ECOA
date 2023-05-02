@@ -11,3 +11,6 @@ export const RequestQuestions = async () =>
 
 export const RequestSurveys = async () =>
     await axios.get('http://localhost:4000/getSurveys')
+
+export const postQuestion = async (data) =>
+    await axios.post('http://localhost:4000/postQuestion', data)

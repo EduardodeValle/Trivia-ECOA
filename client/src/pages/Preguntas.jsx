@@ -11,10 +11,28 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
+import { postQuestion } from '../api/tasks.api.js'
 import { UserContext } from '../context/UserContext.jsx'
 import { useNavigate } from 'react-router-dom';
 
 function Preguntas() {
+
+  const [clave_pregunta, setClave] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [tipo, setTipo] = useState("");
+  const [dirigido, setDirigido] = useState("");
+
+  // funcion que agrega nuevas preguntas a la base de datos
+  const newQuestion = async () => {
+    console.log(clave_pregunta + " " + descripcion + " " + tipo + " " + dirigido);
+    const data = {
+      clave_pregunta: clave_pregunta,
+      descripcion: descripcion,
+      tipo: tipo,
+      dirigido_a: dirigido
+    };
+    const response = await postQuestion(data);
+  };
 
   const navigate = useNavigate();
   const handleRegresar = () => {
@@ -36,14 +54,10 @@ function Preguntas() {
   };
 
   const handleSelectChange3 = (event) => {
-    setSelectedOption2(event.target.value);
+    setSelectedOption3(event.target.value);
   };
 
   const MenuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion }));
-  //const menuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.clave_pregunta }));
-
-  //console.log(preguntas.data);
-  //console.log("MenuItems: " + menuItems);
 
   return (
     <div>
@@ -53,10 +67,10 @@ function Preguntas() {
           <div className="preguntas-grey-container">
             <h2 className="box-title">Altas</h2>
             <p className="altas-text1">Clave:
-              <TextField id="filled-basic" label="Identificador único" variant="outlined" />
+              <TextField id="filled-basic" label="Identificador único" variant="outlined" onChange={(e) => setClave(e.target.value)}/>
             </p>
             <p className="altas-text1">Pregunta:
-              <TextField id="filled-basic" label="Descripción" variant="outlined" />
+              <TextField id="filled-basic" label="Descripción" variant="outlined" onChange={(e) => setDescripcion(e.target.value)}/>
             </p>
             <p className="altas-text2">Tipo:
               <FormControl>
@@ -64,8 +78,9 @@ function Preguntas() {
                 <RadioGroup
                   aria-labelledby="tipo-preguntas"
                   name="radio-buttons-group"
+                  onChange={(e) => setTipo(e.target.value)}
                 >
-                  <FormControlLabel value="Rango" control={<Radio />} label="Rango" />
+                  <FormControlLabel value="Cerrada" control={<Radio />} label="Cerrada" />
                   <FormControlLabel value="Abierta" control={<Radio />} label="Abierta" />
                 </RadioGroup>
               </FormControl>
@@ -76,6 +91,7 @@ function Preguntas() {
                 <RadioGroup
                   aria-labelledby="dirigido-preguntas"
                   name="radio-buttons-group"
+                  onChange={(e) => setDirigido(e.target.value)}
                 >
                   <FormControlLabel value="Profesor" control={<Radio />} label="Profesor" />
                   <FormControlLabel value="Materia" control={<Radio />} label="Materia" />
@@ -84,7 +100,7 @@ function Preguntas() {
               </FormControl>
             </p>
             <p className="altas-text4">
-              <Button variant="contained">Guardar</Button>
+              <Button variant="contained" onClick={newQuestion}>Guardar</Button>
             </p>
           </div>
           <div className="preguntas-middle">
@@ -109,7 +125,7 @@ function Preguntas() {
                 </FormControl>
               </p>
               <p className="archivar-text1">
-                <TextField fullWidth label={selectedOption1 ? MenuItems.find(item => item.value === selectedOption1).label : ""} id="Descripciónnnnnnn" />
+                <TextField fullWidth label="" value={selectedOption1 ? MenuItems.find(item => item.value === selectedOption1).label : ""} id="descripcion_1" InputProps={{readOnly: true,}} />
               </p>
               <p className="bajas-text2">
                 <Button variant="contained">Archivar</Button>
@@ -136,7 +152,7 @@ function Preguntas() {
                 </FormControl>
               </p>
               <p className="archivar-text1">
-                <TextField fullWidth label={selectedOption2 ? MenuItems.find(item => item.value === selectedOption2).label : ""} id="Descripcion_2" />
+                <TextField fullWidth label="" value={selectedOption2 ? MenuItems.find(item => item.value === selectedOption2).label : ""} id="descripcion_2" InputProps={{readOnly: true,}}  />
               </p>
               <p className="bajas-text2">
                 <Button variant="contained">Archivar</Button>
@@ -145,11 +161,26 @@ function Preguntas() {
           </div>
           <div className="preguntas-grey-container">
             <h2 className="box-title">Cambios</h2>
-            <p className="altas-text1">Clave:
-              <TextField id="filled-basic" label="Identificador único" variant="outlined" />
+            <p className="bajas-text1">
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Pregunta</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Pregunta"
+                  value={selectedOption3}
+                  onChange={handleSelectChange3}
+                >
+                  {MenuItems.map(menuItem => (
+                    <MenuItem key={menuItem.value} value={menuItem.value}>
+                      {menuItem.value}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </p>
-            <p className="altas-text1">Pregunta:
-              <TextField id="filled-basic" label="Descripción" variant="outlined" />
+            <p className="altas-text1">
+            <TextField fullWidth label="" value={selectedOption3 ? MenuItems.find(item => item.value === selectedOption3).label : ""} id="descripcion_3" />
             </p>
             <p className="altas-text2">Tipo:
               <FormControl>

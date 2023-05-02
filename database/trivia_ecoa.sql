@@ -86,7 +86,7 @@ CREATE TABLE Banco_preguntas_ECOA(
     descripcion VARCHAR(200),
     dirigido_a VARCHAR(13),
     tipo VARCHAR(7),
-    archivada BOOL,
+    archivada BOOL DEFAULT 0,
     PRIMARY KEY (clave_pregunta)
 );
 
@@ -97,6 +97,7 @@ CREATE TABLE Encuesta(
     fecha_final DATE,
     periodo_de_activacion VARCHAR(50),
     activa BOOL,
+    archivada BOOL DEFAULT 0,
     PRIMARY KEY (clave_encuesta)
 );
 
@@ -575,7 +576,10 @@ CALL getSubjectsQuestions('A00242489');  	# obtener preguntas faltantes de las m
 CALL getCoreSubjectsQuestions('A00242489'); # obtener preguntas faltantes de los bloques que cursa el alumno
 CALL finishSurvey();						# eliminar preguntas sin terminar, desactivar encuesta y materias al finalizar periodo
 
-
+ -- A00242500 alumno que no ha terminado todas las preguntas de profesores, faltan las preguntas de materias y bloques
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00242500", "s1", "pregunta1", "8", NULL, 'L00621778');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00242500", "s1", "pregunta4", "10", NULL, 'L00621778');
+insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00242500", "s1", "pregunta1", "5", NULL, 'L00621996');
 # =========================================================================================================
 # =========================================================================================================
 

@@ -66,7 +66,7 @@ export const getSurveys = async (req, res) => {
 export const getQuestions = async (req, res) => {
     try {
         const [result] = await pool.query("SELECT * FROM Banco_preguntas_ECOA;");
-        console.log(result)
+        //console.log(result)
         res.json(result);
     } catch (error) {
         console.log(error.message);
@@ -88,6 +88,18 @@ export const activateSurvey = async (req, res) => {
 export const finishSurvey = async (req, res) => {
     try {
         const [result] = await pool.query("CALL finishSurvey();");
+        res.sendStatus(200);
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const postQuestion = async (req, res) => {
+    try {
+        const {clave_pregunta, descripcion, dirigido_a, tipo} = req.body;
+        const [result] = await pool.query("INSERT INTO Banco_preguntas_ECOA (clave_pregunta, descripcion, dirigido_a, tipo, archivada) VALUES (?, ?, ?, ?, 0);", [clave_pregunta, descripcion, dirigido_a, tipo, 0]);
+        console.log("Se agrego exitosamente la pregunta " + clave_pregunta)
         res.sendStatus(200);
     } catch (error) {
         console.log(error.message);
