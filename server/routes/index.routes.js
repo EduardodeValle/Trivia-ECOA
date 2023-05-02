@@ -7,4 +7,6 @@ router.post('/user', getUser)
 
 router.post('/student-survey', getStudentSurvey)
 
+router.get('/getSurveys', getSurveys)
+
 export default router;

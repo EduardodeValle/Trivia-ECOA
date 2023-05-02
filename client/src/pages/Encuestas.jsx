@@ -50,9 +50,6 @@ function Encuestas() {
   const handleRegresar = () => {
     navigate('/admin');
   };
-  const handleActivar = () => {
-    navigate('/activar');
-  };
 
 
   return (
@@ -60,85 +57,123 @@ function Encuestas() {
       <main className="encuestas-container">
         <h1 className="encuestas-title">Configuración de Encuestas</h1>
         <div className="encuestas-main">
+
           <div className="encuestas-grey-container">
-            <h2 className="box-title">Crear Encuesta</h2>
+            <h2 className="box-title">Crear</h2>
+            <div className="crear-text1">
+                <TextField fullWidth label="Identificador único" id="Identificador único" />
+            </div>
+            <div className="crear-text1">
+                <TextField fullWidth label="Descripción" id="Descripción" />
+            </div>
             <div className="crear-text2"> Preguntas:
-              <FormControl sx={{ m: 1, width: 300 }}>
+                <FormControl sx={{ m: 1, width: 300 }}>
                 <InputLabel id="demo-multiple-checkbox-label">Selecciona</InputLabel>
                 <Select
-                  labelId="demo-multiple-checkbox-label"
-                  id="demo-multiple-checkbox"
-                  multiple
-                  value={personName}
-                  onChange={handleChange}
-                  input={<OutlinedInput label="Selecciona" />}
-                  renderValue={(selected) => selected.join(', ')}
-                  MenuProps={MenuProps}
+                    labelId="demo-multiple-checkbox-label"
+                    id="demo-multiple-checkbox"
+                    multiple
+                    value={personName}
+                    onChange={handleChange}
+                    input={<OutlinedInput label="Selecciona" />}
+                    renderValue={(selected) => selected.join(', ')}
+                    MenuProps={MenuProps}
                 >
-                  {names.map((name) => (
+                    {names.map((name) => (
                     <MenuItem key={name} value={name}>
-                      <Checkbox checked={personName.indexOf(name) > -1} />
-                      <ListItemText primary={name} />
+                        <Checkbox checked={personName.indexOf(name) > -1} />
+                        <ListItemText primary={name} />
                     </MenuItem>
-                  ))}
+                    ))}
                 </Select>
-              </FormControl>
+                </FormControl>
             </div>
-            <div className="crear-text3">
+            <p className="crear-text4">
+                <Button variant="contained">Guardar</Button>
+            </p>
+          </div>
+
+          <div className="encuestas-grey-container">
+            <h2 className="box-title">Archivar</h2>
+            <div className="crear-text1">
               <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Tipo</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Tipo"
-                >
-                  <MenuItem>Tipo 1</MenuItem>
-                  <MenuItem>Tipo 2</MenuItem>
-                  <MenuItem>Tipo 3</MenuItem>
-                </Select>
+                  <InputLabel id="demo-simple-select-label">Identificador Único</InputLabel>
+                  <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Identificador Único"
+                  >
+                      <MenuItem>Pregunta 1</MenuItem>
+                      <MenuItem>Pregunta 2</MenuItem>
+                      <MenuItem>Pregunta 3</MenuItem>
+                  </Select>
               </FormControl>
             </div>
             <div className="crear-text1">
-              <TextField fullWidth label="Nombre de la encuesta" id="Nombre de la encuesta" />
+                <TextField fullWidth label="Descripción" id="Descripción" />
             </div>
-            <p className="crear-text4">
-              <Button variant="contained">Guardar</Button>
+            <div className="archivar-text11">
+              <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Observar Preguntas</InputLabel>
+                  <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Observar Preguntas"
+                  >
+                      <MenuItem>Pregunta 1</MenuItem>
+                      <MenuItem>Pregunta 2</MenuItem>
+                      <MenuItem>Pregunta 3</MenuItem>
+                  </Select>
+              </FormControl>
+            </div>
+            <p className="archivar-text21">
+                <Button variant="contained">Archivar</Button>
             </p>
           </div>
-          <div className="encuestas-right-column">
-            <div className="encuestas-grey-container2">
-              <h2 className="box-title">Borrar Encuesta</h2>
-              <p className="borrar-text1">
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Encuesta</InputLabel>
+
+          <div className="encuestas-grey-container">
+            <h2 className="box-title">Desarchivar</h2>
+            <div className="crear-text1">
+              <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Identificador Único</InputLabel>
                   <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Encuesta"
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Identificador Único"
                   >
-                    <MenuItem>Pregunta 1</MenuItem>
-                    <MenuItem>Pregunta 2</MenuItem>
-                    <MenuItem>Pregunta 3</MenuItem>
+                      <MenuItem>Pregunta 1</MenuItem>
+                      <MenuItem>Pregunta 2</MenuItem>
+                      <MenuItem>Pregunta 3</MenuItem>
                   </Select>
-                </FormControl>
-              </p>
-              <p className="borrar-text2">
-                <Button variant="contained">Archivar</Button>
-              </p>
+              </FormControl>
             </div>
-            <div className="encuestas-grey-container3">
-              <h2 className="box-title">Activar Encuesta</h2>
-              <p className="activar-text1">
-                <Button variant="contained" onClick={handleActivar}>Ingresar para activar</Button>
-              </p>
+            <div className="crear-text1">
+                <TextField fullWidth label="Descripción" id="Descripción" />
             </div>
+            <div className="archivar-text11">
+              <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Observar Preguntas</InputLabel>
+                  <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      label="Observar Preguntas"
+                  >
+                      <MenuItem>Pregunta 1</MenuItem>
+                      <MenuItem>Pregunta 2</MenuItem>
+                      <MenuItem>Pregunta 3</MenuItem>
+                  </Select>
+              </FormControl>
+            </div>
+            <p className="archivar-text21">
+                <Button variant="contained">Desarchivar</Button>
+            </p>
           </div>
+
         </div>
       </main>
       <div className="arrow-back-icon">
         <Button variant="contained" onClick={handleRegresar} startIcon={<ArrowBackIcon />}></Button>
       </div>
-
     </div>
   );
 }

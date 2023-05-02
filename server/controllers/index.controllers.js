@@ -52,3 +52,14 @@ export const getStudentSurvey = async (req, res) => {
         return res.status(500).json({ message: error.message })
     }
 }
+
+export const getSurveys = async (req, res) => {
+    try {
+        const [result] = await pool.query("SELECT * FROM Encuesta;");
+        console.log(result);
+        res.json(result[0]);
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
