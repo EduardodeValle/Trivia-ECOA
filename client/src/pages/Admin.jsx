@@ -6,14 +6,14 @@ import { UserContext } from '../context/UserContext.jsx'
 
 function Admin() {
 
-  const { msg, preguntas, encuestas } = useContext(UserContext);
+  const { msg, preguntas, encuestas, encuestasArchivadas } = useContext(UserContext);
 
   console.log("===================================================");
   console.log(msg);
   console.log("===================================================");
-  console.log(preguntas);
-  console.log("===================================================");
   console.log(encuestas);
+  console.log("===================================================");
+  console.log(encuestasArchivadas);
   console.log("===================================================");
 
 

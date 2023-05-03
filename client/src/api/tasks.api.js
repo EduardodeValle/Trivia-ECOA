@@ -18,8 +18,11 @@ export const UnarchiveQuestion = async (data) =>
 export const UpdateQuestion = async (data) =>
     await axios.post('http://localhost:4000/updateQuestion', data)
 
-export const RequestSurveys = async () =>
-    await axios.get('http://localhost:4000/getSurveys')
+export const RequestSurveys = async (archivada) =>
+    await axios.post('http://localhost:4000/getSurveys', archivada)
 
 export const PostQuestion = async (data) =>
     await axios.post('http://localhost:4000/postQuestion', data)
+
+export const PostSurvey = async (data) =>
+    await axios.post('http://localhost:4000/postSurvey', data)

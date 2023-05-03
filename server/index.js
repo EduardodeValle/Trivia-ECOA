@@ -18,7 +18,7 @@ app.listen(PORT);
 console.log(`Server is listening on port ${PORT}`);
 
 //                     'minuto hora * * *'
-const job = new CronJob('0 0 * * *', async function () {
+const job = new CronJob('0 10 * * *', async function () {
     console.log('Esta tarea se ejecutará todos los días a las 00:00 horas');
 
     try {

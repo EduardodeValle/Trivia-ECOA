@@ -13,8 +13,6 @@ import ArrowBackIcon from '@mui/icons-material/esm/ArrowBack.js';
 import { useNavigate } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 
-
-
 function Activar() {
 
   const navigate = useNavigate();

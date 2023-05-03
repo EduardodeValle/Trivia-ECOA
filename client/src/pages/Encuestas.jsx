@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import './Encuestas.css';
 import OutlinedInput from '@mui/material/OutlinedInput/index.js';
 import InputLabel from '@mui/material/InputLabel/index.js';
@@ -10,8 +10,9 @@ import Checkbox from '@mui/material/Checkbox/index.js';
 import TextField from '@mui/material/TextField/index.js';
 import Button from '@mui/material/Button/index.js';
 import ArrowBackIcon from '@mui/icons-material/esm/ArrowBack.js';
+import { PostSurvey } from '../api/tasks.api.js'
 import { useNavigate } from 'react-router-dom';
-
+import { UserContext } from '../context/UserContext.jsx'
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -34,7 +35,12 @@ const names = [
 ];
 
 function Encuestas() {
+  const [clave_encuesta, setClave] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [preguntasClient, setPreguntas] = useState([]); // preguntasClient son las preguntas seleccionadas por el cliente en el dropdown
   const [personName, setPersonName] = React.useState([]);
+
+  const { encuestas, encuetasArchivadas, preguntas } = useContext(UserContext);
 
   const handleChange = (event) => {
     const {
@@ -44,6 +50,18 @@ function Encuestas() {
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value,
     );
+    setPreguntas(value);
+  };
+
+  const newSurvey = async () => {
+    //console.log(clave_encuesta + " " + descripcion);
+    //console.log(preguntasClient);
+    const data = {
+      clave_encuesta: clave_encuesta,
+      descripcion: descripcion,
+      preguntas_de_encuesta: preguntasClient
+    };
+    const response = await PostSurvey(data);
   };
 
   const navigate = useNavigate();
@@ -61,35 +79,35 @@ function Encuestas() {
           <div className="encuestas-grey-container">
             <h2 className="box-title">Crear</h2>
             <div className="crear-text1">
-                <TextField fullWidth label="Identificador único" id="Identificador único" />
+              <TextField fullWidth label="Identificador único" id="Identificador único" onChange={(e) => setClave(e.target.value)} />
             </div>
             <div className="crear-text1">
-                <TextField fullWidth label="Descripción" id="Descripción" />
+              <TextField fullWidth label="Descripción" id="Descripción" onChange={(e) => setDescripcion(e.target.value)} />
             </div>
             <div className="crear-text2"> Preguntas:
-                <FormControl sx={{ m: 1, width: 300 }}>
+              <FormControl sx={{ m: 1, width: 300 }}>
                 <InputLabel id="demo-multiple-checkbox-label">Selecciona</InputLabel>
                 <Select
-                    labelId="demo-multiple-checkbox-label"
-                    id="demo-multiple-checkbox"
-                    multiple
-                    value={personName}
-                    onChange={handleChange}
-                    input={<OutlinedInput label="Selecciona" />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={MenuProps}
+                  labelId="demo-multiple-checkbox-label"
+                  id="demo-multiple-checkbox"
+                  multiple
+                  value={personName}
+                  onChange={handleChange}
+                  input={<OutlinedInput label="Selecciona" />}
+                  renderValue={(selected) => selected.join(', ')}
+                  MenuProps={MenuProps}
                 >
-                    {names.map((name) => (
-                    <MenuItem key={name} value={name}>
-                        <Checkbox checked={personName.indexOf(name) > -1} />
-                        <ListItemText primary={name} />
+                  {preguntas.map((pregunta) => (
+                    <MenuItem key={pregunta.clave_pregunta} value={pregunta.clave_pregunta}>
+                      <Checkbox checked={personName.indexOf(pregunta.clave_pregunta) > -1} />
+                      <ListItemText primary={pregunta.clave_pregunta} />
                     </MenuItem>
-                    ))}
+                  ))}
                 </Select>
-                </FormControl>
+              </FormControl>
             </div>
             <p className="crear-text4">
-                <Button variant="contained">Guardar</Button>
+              <Button variant="contained" onClick={newSurvey}>Guardar</Button>
             </p>
           </div>
 
@@ -97,37 +115,37 @@ function Encuestas() {
             <h2 className="box-title">Archivar</h2>
             <div className="crear-text1">
               <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Identificador Único</InputLabel>
-                  <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Identificador Único"
-                  >
-                      <MenuItem>Pregunta 1</MenuItem>
-                      <MenuItem>Pregunta 2</MenuItem>
-                      <MenuItem>Pregunta 3</MenuItem>
-                  </Select>
+                <InputLabel id="demo-simple-select-label">Identificador Único</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Identificador Único"
+                >
+                  <MenuItem>Pregunta 1</MenuItem>
+                  <MenuItem>Pregunta 2</MenuItem>
+                  <MenuItem>Pregunta 3</MenuItem>
+                </Select>
               </FormControl>
             </div>
             <div className="crear-text1">
-                <TextField fullWidth label="Descripción" id="Descripción" />
+              <TextField fullWidth label="Descripción" id="Descripción" />
             </div>
             <div className="archivar-text11">
               <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Observar Preguntas</InputLabel>
-                  <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Observar Preguntas"
-                  >
-                      <MenuItem>Pregunta 1</MenuItem>
-                      <MenuItem>Pregunta 2</MenuItem>
-                      <MenuItem>Pregunta 3</MenuItem>
-                  </Select>
+                <InputLabel id="demo-simple-select-label">Observar Preguntas</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Observar Preguntas"
+                >
+                  <MenuItem>Pregunta 1</MenuItem>
+                  <MenuItem>Pregunta 2</MenuItem>
+                  <MenuItem>Pregunta 3</MenuItem>
+                </Select>
               </FormControl>
             </div>
             <p className="archivar-text21">
-                <Button variant="contained">Archivar</Button>
+              <Button variant="contained">Archivar</Button>
             </p>
           </div>
 
@@ -135,37 +153,37 @@ function Encuestas() {
             <h2 className="box-title">Desarchivar</h2>
             <div className="crear-text1">
               <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Identificador Único</InputLabel>
-                  <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Identificador Único"
-                  >
-                      <MenuItem>Pregunta 1</MenuItem>
-                      <MenuItem>Pregunta 2</MenuItem>
-                      <MenuItem>Pregunta 3</MenuItem>
-                  </Select>
+                <InputLabel id="demo-simple-select-label">Identificador Único</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Identificador Único"
+                >
+                  <MenuItem>Pregunta 1</MenuItem>
+                  <MenuItem>Pregunta 2</MenuItem>
+                  <MenuItem>Pregunta 3</MenuItem>
+                </Select>
               </FormControl>
             </div>
             <div className="crear-text1">
-                <TextField fullWidth label="Descripción" id="Descripción" />
+              <TextField fullWidth label="Descripción" id="Descripción" />
             </div>
             <div className="archivar-text11">
               <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Observar Preguntas</InputLabel>
-                  <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      label="Observar Preguntas"
-                  >
-                      <MenuItem>Pregunta 1</MenuItem>
-                      <MenuItem>Pregunta 2</MenuItem>
-                      <MenuItem>Pregunta 3</MenuItem>
-                  </Select>
+                <InputLabel id="demo-simple-select-label">Observar Preguntas</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Observar Preguntas"
+                >
+                  <MenuItem>Pregunta 1</MenuItem>
+                  <MenuItem>Pregunta 2</MenuItem>
+                  <MenuItem>Pregunta 3</MenuItem>
+                </Select>
               </FormControl>
             </div>
             <p className="archivar-text21">
-                <Button variant="contained">Desarchivar</Button>
+              <Button variant="contained">Desarchivar</Button>
             </p>
           </div>
 

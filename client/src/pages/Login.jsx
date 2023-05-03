@@ -9,7 +9,7 @@ function Login() {
   const [id_usuario, setid_usuario] = useState('');
   const [contrasenia, setPassword] = useState('');
   const navigate = useNavigate();
-  const { msg, setMSG, preguntas, setPreguntas, preguntasArchivadas, setPreguntasArchivadas, encuestas, setEncuestas } = useContext(UserContext);
+  const { msg, setMSG, preguntas, setPreguntas, preguntasArchivadas, setPreguntasArchivadas, encuestas, setEncuestas, encuestasArchivadas, setEncuestasArchivadas } = useContext(UserContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -20,6 +20,7 @@ function Login() {
     const response_login = await RequestLogin(credentials);
     if (response_login.data.success) {
       const message = 'Bienvenido ' + response_login.data.nombre;
+      setid_usuario(id_usuario);
       setMSG(message);
       if (response_login.data.ocupacion === 'Alumno') { 
         const response_survey = await RequestStudentSurvey({ "alumno_matricula": id_usuario });
@@ -35,8 +36,10 @@ function Login() {
         setPreguntas(questions_response.data); // estableciendo preguntas no archivadas
         questions_response = await RequestQuestions( {archivado: 1} );
         setPreguntasArchivadas(questions_response.data); // estableciendo preguntas archivadas
-        const surveys_response = await RequestSurveys();
+        let surveys_response = await RequestSurveys( {archivada: 0} ); 
         setEncuestas(surveys_response.data); // estableciendo encuestas no archivadas
+        surveys_response = await RequestSurveys( {archivada: 1} ); 
+        setEncuestasArchivadas(surveys_response.data); // estableciendo encuestas archivadas
         //console.log("===============================================");
         //console.log(preguntas)
         //console.log("===============================================");

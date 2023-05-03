@@ -10,6 +10,8 @@ const UserProvider = (props) => {
     return (
       <MyContext.Provider
         value={{
+          id_usuario,
+          setIDusuario,
           msg,
           setMSG,
           preguntas,
@@ -17,7 +19,9 @@ const UserProvider = (props) => {
           preguntasArchivadas,
           setPreguntasArchivadas,
           encuestas,
-          setEncuestas
+          setEncuestas,
+          encuestasArchivadas,
+          setEncuestasArchivadas
         }}
       >
         {props.children}
