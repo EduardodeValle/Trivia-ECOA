@@ -11,7 +11,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
-import { PostQuestion, ArchiveQuestion, UnarchiveQuestion } from '../api/tasks.api.js'
+import { PostQuestion, ArchiveQuestion, UnarchiveQuestion, UpdateQuestion } from '../api/tasks.api.js'
 import { UserContext } from '../context/UserContext.jsx'
 import { useNavigate } from 'react-router-dom';
 
@@ -19,8 +19,8 @@ function Preguntas() {
 
   const [clave_pregunta, setClave] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [tipo, setTipo] = useState("");
-  const [dirigido, setDirigido] = useState("");
+  const [tipo, setTipo] = useState("Cerrada");
+  const [dirigido, setDirigido] = useState("Profesor");
 
   // funcion que agrega nuevas preguntas a la base de datos
   const newQuestion = async () => {
@@ -50,6 +50,17 @@ function Preguntas() {
     const response = await UnarchiveQuestion(data);
   };
 
+  const updateQuestion = async () => {
+    //console.log(clave_pregunta + " " + descripcion + " " + dirigido + " " + tipo);
+    const data = {
+      clave_pregunta: clave_pregunta,
+      descripcion: descripcion,
+      dirigido_a: dirigido,
+      tipo: tipo
+    };
+    const response = await UpdateQuestion(data);
+  };
+
   const navigate = useNavigate();
   const handleRegresar = () => {
     navigate('/admin');
@@ -57,9 +68,9 @@ function Preguntas() {
 
   const { preguntas, preguntasArchivadas } = useContext(UserContext);
 
-  const [selectedOption1, setSelectedOption1] = useState("");
-  const [selectedOption2, setSelectedOption2] = useState("");
-  const [selectedOption3, setSelectedOption3] = useState("");
+  const [selectedOption1, setSelectedOption1] = useState(""); // actualiza los valores del FormControl para archivar preguntas
+  const [selectedOption2, setSelectedOption2] = useState(""); // actualiza los valores del FormControl para desarchivar preguntas
+  const [selectedOption3, setSelectedOption3] = useState(""); // actualiza los valores del FormControl para modificar preguntas
 
   const handleSelectChange1 = (event) => {
     setSelectedOption1(event.target.value);
@@ -71,11 +82,17 @@ function Preguntas() {
     setClave(event.target.value); // obtener el nuevo valor para desarchivar una pregunta
   };
 
+  // SelectChange de la tarjeta para actualizar preguntas
   const handleSelectChange3 = (event) => {
     setSelectedOption3(event.target.value);
+    const selectedPregunta = preguntas.find(pregunta => pregunta.clave_pregunta === event.target.value);
+    setClave(event.target.value);
+    setDescripcion(selectedPregunta.descripcion);
+    setDirigido(selectedPregunta.dirigido_a);
+    setTipo(selectedPregunta.tipo);
   };
 
-  const MenuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion })); // Items de preguntas no archivadas
+  const MenuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion, dirigido: pregunta.dirigido_a, tipo: pregunta.tipo })); // Items de preguntas no archivadas
   const MenuItemsArchived = preguntasArchivadas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion })); // items de preguntas archivadas
 
 
@@ -87,10 +104,10 @@ function Preguntas() {
           <div className="preguntas-grey-container">
             <h2 className="box-title">Altas</h2>
             <p className="altas-text1">Clave:
-              <TextField id="filled-basic" label="Identificador único" variant="outlined" onChange={(e) => setClave(e.target.value)}/>
+              <TextField id="filled-basic" label="Identificador único" variant="outlined" onChange={(e) => setClave(e.target.value)} />
             </p>
             <p className="altas-text1">Pregunta:
-              <TextField id="filled-basic" label="Descripción" variant="outlined" onChange={(e) => setDescripcion(e.target.value)}/>
+              <TextField id="filled-basic" label="Descripción" variant="outlined" onChange={(e) => setDescripcion(e.target.value)} />
             </p>
             <p className="altas-text2">Tipo:
               <FormControl>
@@ -145,7 +162,7 @@ function Preguntas() {
                 </FormControl>
               </p>
               <p className="archivar-text1">
-                <TextField fullWidth label="" value={selectedOption1 ? MenuItems.find(item => item.value === selectedOption1).label : ""} id="descripcion_1" InputProps={{readOnly: true,}} />
+                <TextField fullWidth label="" value={selectedOption1 ? MenuItems.find(item => item.value === selectedOption1).label : ""} id="descripcion_1" />
               </p>
               <p className="bajas-text2">
                 <Button variant="contained" onClick={archiveQuestion}>Archivar</Button>
@@ -172,7 +189,7 @@ function Preguntas() {
                 </FormControl>
               </p>
               <p className="archivar-text1">
-                <TextField fullWidth label="" value={selectedOption2 ? MenuItemsArchived.find(item => item.value === selectedOption2).label : ""} id="descripcion_2" InputProps={{readOnly: true,}}  />
+                <TextField fullWidth label="" value={selectedOption2 ? MenuItemsArchived.find(item => item.value === selectedOption2).label : ""} id="descripcion_2" />
               </p>
               <p className="bajas-text2">
                 <Button variant="contained" onClick={unarchiveQuestion}>Desarchivar</Button>
@@ -200,7 +217,7 @@ function Preguntas() {
               </FormControl>
             </p>
             <p className="altas-text1">
-            <TextField fullWidth label="" value={selectedOption3 ? MenuItems.find(item => item.value === selectedOption3).label : ""} id="descripcion_3" />
+              <TextField fullWidth label="" value={descripcion} onChange={(event) => setDescripcion(event.target.value)} />
             </p>
             <p className="altas-text2">Tipo:
               <FormControl>
@@ -208,8 +225,9 @@ function Preguntas() {
                 <RadioGroup
                   aria-labelledby="tipo-preguntas"
                   name="radio-buttons-group"
+                  onChange={(e) => setTipo(e.target.value)}
                 >
-                  <FormControlLabel value="Rango" control={<Radio />} label="Rango" />
+                  <FormControlLabel value="Cerrada" control={<Radio />} label="Cerrada" />
                   <FormControlLabel value="Abierta" control={<Radio />} label="Abierta" />
                 </RadioGroup>
               </FormControl>
@@ -220,6 +238,7 @@ function Preguntas() {
                 <RadioGroup
                   aria-labelledby="dirigido-preguntas"
                   name="radio-buttons-group"
+                  onChange={(e) => setDirigido(e.target.value)}
                 >
                   <FormControlLabel value="Profesor" control={<Radio />} label="Profesor" />
                   <FormControlLabel value="Materia" control={<Radio />} label="Materia" />
@@ -228,7 +247,7 @@ function Preguntas() {
               </FormControl>
             </p>
             <p className="altas-text4">
-              <Button variant="contained">Guardar</Button>
+              <Button variant="contained" onClick={updateQuestion}>Guardar</Button>
             </p>
           </div>
         </div>

@@ -15,6 +15,9 @@ export const ArchiveQuestion = async (data) =>
 export const UnarchiveQuestion = async (data) =>
     await axios.post('http://localhost:4000/unarchiveQuestion', data)
 
+export const UpdateQuestion = async (data) =>
+    await axios.post('http://localhost:4000/updateQuestion', data)
+
 export const RequestSurveys = async () =>
     await axios.get('http://localhost:4000/getSurveys')
 
