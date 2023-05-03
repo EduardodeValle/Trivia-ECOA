@@ -10,7 +10,7 @@ import Checkbox from '@mui/material/Checkbox/index.js';
 import TextField from '@mui/material/TextField/index.js';
 import Button from '@mui/material/Button/index.js';
 import ArrowBackIcon from '@mui/icons-material/esm/ArrowBack.js';
-import { PostSurvey } from '../api/tasks.api.js'
+import { PostSurvey, ArchiveSurvey } from '../api/tasks.api.js'
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext.jsx'
 
@@ -64,6 +64,14 @@ function Encuestas() {
       preguntas_de_encuesta: preguntasClient
     };
     const response = await PostSurvey(data);
+  };
+
+  const archiveSurvey = async () => {
+    console.log("Archivando la encuesta " + clave_encuesta);
+    const data = {
+      clave_encuesta: clave_encuesta,
+    };
+    const response = await ArchiveSurvey(data);
   };
 
   const [selectedOption1, setSelectedOption1] = useState(""); // actualiza los valores del FormControl para archivar encuestas
@@ -170,7 +178,7 @@ function Encuestas() {
               </FormControl>
             </div>
             <p className="archivar-text21">
-              <Button variant="contained">Archivar</Button>
+              <Button variant="contained" onClick={archiveSurvey}>Archivar</Button>
             </p>
           </div>
 

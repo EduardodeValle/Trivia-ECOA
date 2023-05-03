@@ -181,3 +181,14 @@ export const postSurvey = async (req, res) => {
         return res.status(500).json({ message: error.message })
     }
 }
+
+export const archiveSurvey = async (req, res) => {
+    try {
+        const { clave_encuesta } = req.body;
+        const [result] = await pool.query("UPDATE Encuesta SET archivada = 1 WHERE clave_encuesta = ?;", [clave_encuesta]);
+        console.log("Se archivo exitosamente la encuesta " + clave_encuesta);
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}

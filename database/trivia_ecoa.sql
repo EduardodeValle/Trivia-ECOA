@@ -568,7 +568,7 @@ SELECT * FROM Preguntas_de_encuesta;
 SELECT * FROM Banco_preguntas_ECOA;
 SELECT * FROM ECOA_temporal;
 
-UPDATE Encuesta SET archivada = 1 WHERE clave_encuesta = "s2";
+UPDATE Encuesta SET archivada = 0 WHERE clave_encuesta = "s1";
 DELETE FROM Encuesta WHERE clave_encuesta = "Nueva";
 DELETE FROM Preguntas_de_encuesta WHERE clave_encuesta = "Nueva";
 

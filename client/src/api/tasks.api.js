@@ -26,3 +26,7 @@ export const PostQuestion = async (data) =>
 
 export const PostSurvey = async (data) =>
     await axios.post('http://localhost:4000/postSurvey', data)
+
+export const ArchiveSurvey = async (data) =>
+    await axios.post('http://localhost:4000/archiveSurvey', data)
+
