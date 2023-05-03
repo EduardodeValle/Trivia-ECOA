@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getUser, getStudentSurvey, getSurveys, getQuestions, postQuestion, archiveQuestion, unarchiveQuestion, updateQuestion, postSurvey, archiveSurvey, unarchiveSurvey, activateSurvey, finishSurvey } from '../controllers/index.controllers.js'
+import { getUser, getStudentSurvey, getSurveys, getQuestions, postQuestion, archiveQuestion, unarchiveQuestion, updateQuestion, postSurvey, archiveSurvey, unarchiveSurvey, activateSurvey, getTeachersQuestions, getSubjectsQuestions, getCoreSubjectsQuestions, finishSurvey } from '../controllers/index.controllers.js'
 
 const router = Router();
 
@@ -28,5 +28,11 @@ router.get('/finishSurvey', finishSurvey)
 router.post('/archiveSurvey', archiveSurvey)
 
 router.post('/unarchiveSurvey', unarchiveSurvey);
+
+router.post('/getTeachersQuestions', getTeachersQuestions)
+
+router.post('/getSubjectsQuestions', getSubjectsQuestions) 
+
+router.post('/getCoreSubjectsQuestions', getCoreSubjectsQuestions)
 
 export default router;

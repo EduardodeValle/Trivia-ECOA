@@ -198,7 +198,41 @@ export const unarchiveSurvey = async (req, res) => {
         const { clave_encuesta } = req.body;
         const [result] = await pool.query("UPDATE Encuesta SET archivada = 0 WHERE clave_encuesta = ?;", [clave_encuesta]);
         console.log("Se desarchivo la encuesa " + clave_encuesta + " exitosamente");
-    } catch(error) {
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
 
+export const getTeachersQuestions = async (req, res) => {
+    try {
+        const { matricula } = req.body;
+        const [result] = await pool.query("CALL getTeachersQuestions(?);", [matricula]);
+        res.json(result);
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const getSubjectsQuestions = async (req, res) => {
+    try {
+        const { matricula } = req.body;
+        const [result] = await pool.query("CALL getSubjectsQuestions(?);", [matricula]);
+        res.json(result);
+    } catch(error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const getCoreSubjectsQuestions = async (req, res) => {
+    try {
+        const { matricula } = req.body;
+        const [result] = await pool.query("CALL getCoreSubjectsQuestions(?);", [matricula]);
+        res.json(result);
+    } catch(error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
     }
 }
