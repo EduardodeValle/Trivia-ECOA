@@ -31,7 +31,7 @@ export const getUser = async (req, res) => {
                 const [rows] = await pool.query("SELECT nombre from Colaborador WHERE colaborador_nomina = ?;", [colaborador_nomina]);
                 resultName = rows[0].nombre;
             }
-      
+
             res.json({ success: true, ocupacion: result[0].ocupacion, nombre: resultName });
 
         }
@@ -56,7 +56,20 @@ export const getStudentSurvey = async (req, res) => {
 export const getSurveys = async (req, res) => {
     try {
         const { archivada } = req.body;
+
+        // obteniendo todas las encuestas archivadas o no archivadas
         const [result] = await pool.query("SELECT * FROM Encuesta WHERE archivada = ?;", [archivada]);
+
+        // se asigna a cada encuesta un nuevo atributo que contiene todas las preguntas de la misma
+        for (let i = 0; i < result.length; i++) {
+            result[i].preguntas_de_encuesta = [];
+            const [survey_questions] = await pool.query("SELECT * FROM Preguntas_de_encuesta WHERE clave_encuesta = ?;", [result[i].clave_encuesta]);
+            for (let j = 0; j < survey_questions.length; j++) {
+                result[i].preguntas_de_encuesta.push(survey_questions[j].clave_pregunta);
+            }
+        }
+
+        // finalmente se devuelve un json de todas las encuestas donde cada una tiene las preguntas en un arreglo de objetos
         res.json(result);
     } catch (error) {
         console.log(error.message);
@@ -99,7 +112,7 @@ export const finishSurvey = async (req, res) => {
 
 export const postQuestion = async (req, res) => {
     try {
-        const {clave_pregunta, descripcion, dirigido_a, tipo} = req.body;
+        const { clave_pregunta, descripcion, dirigido_a, tipo } = req.body;
         const [result] = await pool.query("INSERT INTO Banco_preguntas_ECOA (clave_pregunta, descripcion, dirigido_a, tipo, archivada) VALUES (?, ?, ?, ?, 0);", [clave_pregunta, descripcion, dirigido_a, tipo, 0]);
         console.log("Se agrego exitosamente la pregunta " + clave_pregunta)
         res.sendStatus(200);
@@ -136,7 +149,7 @@ export const unarchiveQuestion = async (req, res) => {
 
 export const updateQuestion = async (req, res) => {
     try {
-        const {clave_pregunta, descripcion, dirigido_a, tipo} = req.body;
+        const { clave_pregunta, descripcion, dirigido_a, tipo } = req.body;
         console.log("Backend: " + clave_pregunta + " " + descripcion + " " + dirigido_a + " " + tipo);
         const [result] = await pool.query("UPDATE Banco_preguntas_ECOA SET descripcion = ?, dirigido_a = ?, tipo = ? WHERE clave_pregunta = ?;", [descripcion, dirigido_a, tipo, clave_pregunta]);
         console.log("Se modifico exitosamente la pregunta " + clave_pregunta);
@@ -155,7 +168,7 @@ export const postSurvey = async (req, res) => {
         //console.log(preguntas_de_encuesta);
         // creando la nueva encuesta
         const [result_survey] = await pool.query("INSERT INTO Encuesta (clave_encuesta, descripcion) VALUES (?, ?)", [clave_encuesta, descripcion]);
-        
+
         // insertando las preguntas de encuesta
         for (let i = 0; i < preguntas_de_encuesta.length; i++) {
             const [result_questions] = await pool.query("INSERT INTO Preguntas_de_encuesta (clave_encuesta, clave_pregunta) VALUES (?, ?)", [clave_encuesta, preguntas_de_encuesta[i]]);

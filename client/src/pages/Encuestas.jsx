@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import './Encuestas.css';
 import OutlinedInput from '@mui/material/OutlinedInput/index.js';
 import InputLabel from '@mui/material/InputLabel/index.js';
@@ -39,8 +39,10 @@ function Encuestas() {
   const [descripcion, setDescripcion] = useState("");
   const [preguntasClient, setPreguntas] = useState([]); // preguntasClient son las preguntas seleccionadas por el cliente en el dropdown
   const [personName, setPersonName] = React.useState([]);
+  const [selectedOption1Description, setSelectedOption1Description] = useState("");
+  const [preguntasDeEncuesta, setPreguntasDeEncuesta] = useState([]);
 
-  const { encuestas, encuetasArchivadas, preguntas } = useContext(UserContext);
+  const { encuestas, encuestasArchivadas, preguntas } = useContext(UserContext);
 
   const handleChange = (event) => {
     const {
@@ -64,11 +66,30 @@ function Encuestas() {
     const response = await PostSurvey(data);
   };
 
+  const [selectedOption1, setSelectedOption1] = useState(""); // actualiza los valores del FormControl para archivar encuestas
+
+  const handleSelectChange1 = (event) => {
+    setSelectedOption1(event.target.value);
+    setClave(event.target.value); // obtener el nuevo valor para archivar una encuesta
+  };
+
+  useEffect(() => {
+    if (selectedOption1) {
+      const selectedEncuesta = encuestas.find(encuesta => encuesta.clave_encuesta === selectedOption1);
+      setSelectedOption1Description(selectedEncuesta.descripcion);
+      setPreguntasDeEncuesta(selectedEncuesta.preguntas_de_encuesta);
+    } else {
+      setSelectedOption1Description("");
+      setPreguntasDeEncuesta([]);
+    }
+  }, [selectedOption1, encuestas]);
+
   const navigate = useNavigate();
   const handleRegresar = () => {
     navigate('/admin');
   };
 
+  //const MenuItemsArchivedSurvey = encuestasArchivadas.map(encuesta => ({ clave_encuesta: encuesta.clave_encuesta, descripcion: encuesta.descripcion })); // items de preguntas archivadas
 
   return (
     <div>
@@ -120,15 +141,19 @@ function Encuestas() {
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="Identificador Único"
+                  value={selectedOption1}
+                  onChange={handleSelectChange1}
                 >
-                  <MenuItem>Pregunta 1</MenuItem>
-                  <MenuItem>Pregunta 2</MenuItem>
-                  <MenuItem>Pregunta 3</MenuItem>
+                  {encuestas.map(encuesta => (
+                    <MenuItem key={encuesta.clave_encuesta} value={encuesta.clave_encuesta}>
+                      {encuesta.clave_encuesta}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </div>
             <div className="crear-text1">
-              <TextField fullWidth label="Descripción" id="Descripción" />
+              <TextField fullWidth label="Descripción" value={selectedOption1Description} id="Descripción" />
             </div>
             <div className="archivar-text11">
               <FormControl fullWidth>
@@ -138,9 +163,9 @@ function Encuestas() {
                   id="demo-simple-select"
                   label="Observar Preguntas"
                 >
-                  <MenuItem>Pregunta 1</MenuItem>
-                  <MenuItem>Pregunta 2</MenuItem>
-                  <MenuItem>Pregunta 3</MenuItem>
+                  {preguntasDeEncuesta.map((pregunta, index) => (
+                    <MenuItem key={index} value={pregunta}>{pregunta}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </div>

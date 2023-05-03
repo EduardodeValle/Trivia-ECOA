@@ -40,11 +40,11 @@ function Login() {
         setEncuestas(surveys_response.data); // estableciendo encuestas no archivadas
         surveys_response = await RequestSurveys( {archivada: 1} ); 
         setEncuestasArchivadas(surveys_response.data); // estableciendo encuestas archivadas
-        //console.log("===============================================");
-        //console.log(preguntas)
-        //console.log("===============================================");
-        //console.log(encuestas)
-        //console.log("===============================================");
+        console.log("===============================================");
+        console.log(preguntas)
+        console.log("===============================================");
+        console.log(encuestas)
+        console.log("===============================================");
         navigate('/admin'); 
       }
     } else {
