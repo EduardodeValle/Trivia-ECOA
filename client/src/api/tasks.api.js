@@ -33,3 +33,5 @@ export const ArchiveSurvey = async (data) =>
 export const UnarchiveSurvey = async (data) =>
     await axios.post('http://localhost:4000/unarchiveSurvey', data)
 
+export const SetDatesSurvey = async (data) =>
+    await axios.post('http://localhost:4000/setDatesSurvey', data)

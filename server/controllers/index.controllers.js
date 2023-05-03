@@ -187,6 +187,7 @@ export const archiveSurvey = async (req, res) => {
         const { clave_encuesta } = req.body;
         const [result] = await pool.query("UPDATE Encuesta SET archivada = 1 WHERE clave_encuesta = ?;", [clave_encuesta]);
         console.log("Se archivo exitosamente la encuesta " + clave_encuesta);
+        res.sendStatus(200);
     } catch (error) {
         console.log(error.message);
         return res.status(500).json({ message: error.message })
@@ -198,6 +199,7 @@ export const unarchiveSurvey = async (req, res) => {
         const { clave_encuesta } = req.body;
         const [result] = await pool.query("UPDATE Encuesta SET archivada = 0 WHERE clave_encuesta = ?;", [clave_encuesta]);
         console.log("Se desarchivo la encuesa " + clave_encuesta + " exitosamente");
+        res.sendStatus(200);
     } catch (error) {
         console.log(error.message);
         return res.status(500).json({ message: error.message })
@@ -220,7 +222,7 @@ export const getSubjectsQuestions = async (req, res) => {
         const { matricula } = req.body;
         const [result] = await pool.query("CALL getSubjectsQuestions(?);", [matricula]);
         res.json(result);
-    } catch(error) {
+    } catch (error) {
         console.log(error.message);
         return res.status(500).json({ message: error.message })
     }
@@ -231,7 +233,18 @@ export const getCoreSubjectsQuestions = async (req, res) => {
         const { matricula } = req.body;
         const [result] = await pool.query("CALL getCoreSubjectsQuestions(?);", [matricula]);
         res.json(result);
-    } catch(error) {
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const setDatesSurvey = async (req, res) => {
+    try {
+        const { clave_encuesta, fecha_inicio, fecha_final } = req.body;
+        const result = await pool.query("UPDATE Encuesta SET fecha_inicio = ?, fecha_final = ? WHERE clave_encuesta = ?;", [fecha_inicio, fecha_final, clave_encuesta]);
+        console.log("La encuesta " + clave_encuesta + " se programo exitosamente para las fechas " + fecha_inicio + " - " + fecha_final);
+    } catch (error) {
         console.log(error.message);
         return res.status(500).json({ message: error.message })
     }

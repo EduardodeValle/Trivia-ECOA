@@ -9,7 +9,7 @@ function Login() {
   const [id_usuario, setid_usuario] = useState('');
   const [contrasenia, setPassword] = useState('');
   const navigate = useNavigate();
-  const { msg, setMSG, preguntas, setPreguntas, preguntasArchivadas, setPreguntasArchivadas, encuestas, setEncuestas, encuestasArchivadas, setEncuestasArchivadas } = useContext(UserContext);
+  const { id_usuarioContext, setIDusuario, user_name, setUserName, msg, setMSG, preguntas, setPreguntas, preguntasArchivadas, setPreguntasArchivadas, encuestas, setEncuestas, encuestasArchivadas, setEncuestasArchivadas } = useContext(UserContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -21,6 +21,9 @@ function Login() {
     if (response_login.data.success) {
       const message = 'Bienvenido ' + response_login.data.nombre;
       setid_usuario(id_usuario);
+      setIDusuario(id_usuario);
+      setUserName(response_login.data.nombre);
+
       setMSG(message);
       if (response_login.data.ocupacion === 'Alumno') { 
         const response_survey = await RequestStudentSurvey({ "alumno_matricula": id_usuario });

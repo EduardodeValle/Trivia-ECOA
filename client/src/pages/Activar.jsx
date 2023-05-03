@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import './Activar.css';
 import InputLabel from '@mui/material/InputLabel/index.js';
 import MenuItem from '@mui/material/MenuItem/index.js';
@@ -11,13 +11,55 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker/index.js';
 import Button from '@mui/material/Button/index.js';
 import ArrowBackIcon from '@mui/icons-material/esm/ArrowBack.js';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext.jsx'
+import { SetDatesSurvey } from '../api/tasks.api.js'
 import TextField from '@mui/material/TextField';
 
 function Activar() {
 
+  const { encuestas } = useContext(UserContext);
+
   const navigate = useNavigate();
   const handleRegresar = () => {
     navigate('/admin');
+  };
+
+  const [clave_encuesta, setClave] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [fecha_inicio, set_fecha_inicio] = useState("");
+  const [fecha_final, set_fecha_final] = useState("");
+  const [selectedOption1Description, setSelectedOption1Description] = useState("");
+  const [selectedOption1, setSelectedOption1] = useState(""); // actualiza los valores del FormControl para seleccionar una encuesta
+
+  const handleSelectChange1 = (event) => {
+    setSelectedOption1(event.target.value);
+    setClave(event.target.value); // obtener el nuevo valor para archivar una encuesta
+  };
+
+  useEffect(() => {
+    if (selectedOption1) {
+      const selectedEncuesta = encuestas.find(encuesta => encuesta.clave_encuesta === selectedOption1);
+      setSelectedOption1Description(selectedEncuesta.descripcion);
+    } else {
+      setSelectedOption1Description("");
+    }
+  }, [selectedOption1]);
+
+  const setDatesSurvey = async () => {
+    const fechaInicioObjeto = new Date(fecha_inicio); 
+    const fechaFinalObjeto = new Date(fecha_final); 
+
+    const fechaInicioFormateada = `${fechaInicioObjeto.getFullYear()}-${fechaInicioObjeto.getMonth() + 1}-${fechaInicioObjeto.getDate()}`;
+    const fechaFinalFormateada = `${fechaFinalObjeto.getFullYear()}-${fechaFinalObjeto.getMonth() + 1}-${fechaFinalObjeto.getDate()}`;
+
+    //console.log("Activando la encuesta " + clave_encuesta + " para las fechas " + fechaInicioFormateada + " - " + fechaFinalFormateada);
+
+    const data = {
+      clave_encuesta: clave_encuesta,
+      fecha_inicio: fechaInicioFormateada,
+      fecha_final: fechaFinalFormateada
+    };
+    const response = await SetDatesSurvey(data);
   };
 
   return (
@@ -34,33 +76,37 @@ function Activar() {
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="Identificador Único"
+                  value={selectedOption1}
+                  onChange={handleSelectChange1}
                 >
-                  <MenuItem>Pregunta 1</MenuItem>
-                  <MenuItem>Pregunta 2</MenuItem>
-                  <MenuItem>Pregunta 3</MenuItem>
+                  {encuestas.map(encuesta => (
+                    <MenuItem key={encuesta.clave_encuesta} value={encuesta.clave_encuesta}>
+                      {encuesta.clave_encuesta}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </div>
             <div className="config-text1">
-              <TextField fullWidth label="Descripción" id="Descripción" />
+              <TextField fullWidth label="Descripción" value={selectedOption1Description} id="Descripción" />
             </div>
             <div>
               <div className="config-text2">
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={['DatePicker']}>
-                    <DatePicker label="Fecha Inicio" />
+                    <DatePicker label="Fecha Inicio" onChange={(date) => set_fecha_inicio(date)} value={fecha_inicio} />
                   </DemoContainer>
                 </LocalizationProvider>
 
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={['DatePicker']}>
-                    <DatePicker label="Fecha Fin" />
+                    <DatePicker label="Fecha Final" onChange={(date) => set_fecha_final(date)} value={fecha_final} />
                   </DemoContainer>
                 </LocalizationProvider>
               </div>
             </div>
             <div className="config-text3">
-              <Button variant="contained">Activar</Button>
+              <Button variant="contained" onClick={setDatesSurvey}>Activar</Button>
             </div>
           </div>
         </div>

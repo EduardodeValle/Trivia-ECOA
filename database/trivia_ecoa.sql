@@ -96,7 +96,7 @@ CREATE TABLE Encuesta(
     fecha_inicio DATE,
     fecha_final DATE,
     periodo_de_activacion VARCHAR(50),
-    activa BOOL,
+    activa BOOL DEFAULT 0,
     archivada BOOL DEFAULT 0,
     PRIMARY KEY (clave_encuesta)
 );
@@ -547,6 +547,8 @@ CALL setProgresoECOA();
 # Cuando un alumno hace una tirada en el gashapon primero se restan los puntos desde unity y al final se actualiza
 # el nuevo valor de monedas con un query
 
+SELECT * FROM Colaborador;
+
 SELECT * FROM Materia WHERE activa = 1;
 UPDATE Materia SET activa = 1 WHERE CRN = 15073;
 
@@ -568,9 +570,12 @@ SELECT * FROM Preguntas_de_encuesta;
 SELECT * FROM Banco_preguntas_ECOA;
 SELECT * FROM ECOA_temporal;
 
-UPDATE Encuesta SET archivada = 0 WHERE clave_encuesta = "s1";
-DELETE FROM Encuesta WHERE clave_encuesta = "Nueva";
-DELETE FROM Preguntas_de_encuesta WHERE clave_encuesta = "Nueva";
+UPDATE Encuesta SET archivada = 0, activa = 0, fecha_inicio = NULL, fecha_final = NULL WHERE clave_encuesta = "s1";
+UPDATE Encuesta SET archivada = 0, activa = 0, fecha_inicio = '2023-05-03', fecha_final = '2023-05-10' WHERE clave_encuesta = "s1";
+UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = "s1";
+UPDATE Encuesta SET archivada = 1 WHERE clave_encuesta = "s2";
+DELETE FROM Encuesta WHERE clave_encuesta = "Otra";
+DELETE FROM Preguntas_de_encuesta WHERE clave_encuesta = "Otra";
 
 SELECT * FROM Progreso_ECOA;
 SELECT * FROM Elementos_de_partida;
@@ -579,8 +584,8 @@ TRUNCATE TABLE Progreso_ECOA;
 TRUNCATE TABLE Elementos_de_partida;
 
 CALL setProgresoECOA();						# crear registros de videojuegos de los alumnos que reciben encuesta
-CALL getSurvey('A00229540'); 				# ver si el alumno actual tiene encuesta disponible
-CALL getTeachersQuestions('A00242500'); 	# otener preguntas faltantes de profesores de todas las materias
+CALL getSurvey('A00242489'); 				# ver si el alumno actual tiene encuesta disponible
+CALL getTeachersQuestions('A00242489'); 	# otener preguntas faltantes de profesores de todas las materias
 CALL getSubjectsQuestions('A00242489');  	# obtener preguntas faltantes de las materias que cursa el alumno	    
 CALL getCoreSubjectsQuestions('A00242489'); # obtener preguntas faltantes de los bloques que cursa el alumno
 CALL finishSurvey();						# eliminar preguntas sin terminar, desactivar encuesta y materias al finalizar periodo

@@ -1,7 +1,27 @@
-.center {
-    text-align: center;
-  }
-.margin-top {
-    margin-top: 20px;
-  }
+.notf-header {
+  font-size: 2.5rem;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.notf-container {
+  flex: 1;
+  height: 140px;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+}
+
+.notf-text1 {
+  font-size: 24px;
+  text-align: center;
+  margin-right: 20px;
+  margin-left: 20px;
+  max-width: 800px;
+}
     

@@ -1,12 +1,20 @@
+import React, {useContext} from 'react';
 import './Student.css';
-import {useContext} from 'react'
-import { UserContext } from '../context/UserContext.jsx'
 
 function Student() {
-    const { msg } = useContext(UserContext);
+
     return (
-        <h3 className="center margin-top">No hay encuestas disponibles, que tengas un excelente día</h3>
-    )
+        <div>
+
+            <div>
+                <h1 className="note-header">¡Hola, no tienes una ECOA disponible!</h1>
+                <div className="note-container">
+                    <p className="note-text1">Gracias por contestar tus ECOAs, regresa en el siguiente periodo.</p>
+                </div>
+            </div>
+
+        </div>
+    );
 }
 
-export default Student
+export default Student;
