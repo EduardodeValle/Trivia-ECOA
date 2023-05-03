@@ -101,6 +101,10 @@ CREATE TABLE Encuesta(
     PRIMARY KEY (clave_encuesta)
 );
 
+SELECT * FROM banco_preguntas_ecoa;
+UPDATE banco_preguntas_ecoa SET archivada = 1 WHERE clave_pregunta = "pregunta8";
+DELETE FROM banco_preguntas_ecoa WHERE clave_pregunta = "Pregunta_n";
+
 CREATE TABLE Preguntas_de_encuesta(
 	clave_encuesta VARCHAR(10),
     clave_pregunta VARCHAR(10),
@@ -557,6 +561,7 @@ INNER JOIN Materia ON (Imparte.CRN = Materia.CRN)
 WHERE Materia.CRN = 15073;
 
 UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = "s1";
+DELETE FROM Banco_preguntas_ECOA WHERE dirigido_a IS NULL;
 
 SELECT * FROM Encuesta;
 SELECT * FROM Preguntas_de_encuesta;
@@ -570,8 +575,8 @@ TRUNCATE TABLE Progreso_ECOA;
 TRUNCATE TABLE Elementos_de_partida;
 
 CALL setProgresoECOA();						# crear registros de videojuegos de los alumnos que reciben encuesta
-CALL getSurvey('A00242489'); 				# ver si el alumno actual tiene encuesta disponible
-CALL getTeachersQuestions('A00242489'); 	# otener preguntas faltantes de profesores de todas las materias
+CALL getSurvey('A00229540'); 				# ver si el alumno actual tiene encuesta disponible
+CALL getTeachersQuestions('A00242500'); 	# otener preguntas faltantes de profesores de todas las materias
 CALL getSubjectsQuestions('A00242489');  	# obtener preguntas faltantes de las materias que cursa el alumno	    
 CALL getCoreSubjectsQuestions('A00242489'); # obtener preguntas faltantes de los bloques que cursa el alumno
 CALL finishSurvey();						# eliminar preguntas sin terminar, desactivar encuesta y materias al finalizar periodo
@@ -641,6 +646,8 @@ insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) 
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta6", "El bloque se desarrolló de manera coordinada entre los (as) profesores (as):", "Bloque", "Cerrada");
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta7", "Los temas, las actividades y el reto durante el Bloque son aplicables y de valor:", "Bloque", "Cerrada");
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta8", "El acompañamiento que recibí por parte del profesor fue adecuado:", "Profesor", "Cerrada");
+insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo, archivada) values ("pregunta9", "Me gusto tanto la materia que volveria a repetirla:", "Materia", "Cerrada", 1);
+
 
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta1");
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta2");

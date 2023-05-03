@@ -65,8 +65,8 @@ export const getSurveys = async (req, res) => {
 
 export const getQuestions = async (req, res) => {
     try {
-        const [result] = await pool.query("SELECT * FROM Banco_preguntas_ECOA;");
-        //console.log(result)
+        const { archivado } = req.body;
+        const [result] = await pool.query("SELECT * FROM Banco_preguntas_ECOA WHERE archivada = ?;", [archivado]);
         res.json(result);
     } catch (error) {
         console.log(error.message);
@@ -77,7 +77,8 @@ export const getQuestions = async (req, res) => {
 export const activateSurvey = async (req, res) => {
     try {
         const { clave_encuesta } = req.body;
-        const [result] = await pool.query("UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = ?;", [clave_encuesta]);
+        const [result_1] = await pool.query("UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = ?;", [clave_encuesta]);
+        const [result_2] = await pool.query("CALL setProgresoECOA();");
         res.sendStatus(200);
     } catch (error) {
         console.log(error.message);
@@ -101,6 +102,29 @@ export const postQuestion = async (req, res) => {
         const [result] = await pool.query("INSERT INTO Banco_preguntas_ECOA (clave_pregunta, descripcion, dirigido_a, tipo, archivada) VALUES (?, ?, ?, ?, 0);", [clave_pregunta, descripcion, dirigido_a, tipo, 0]);
         console.log("Se agrego exitosamente la pregunta " + clave_pregunta)
         res.sendStatus(200);
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const archiveQuestion = async (req, res) => {
+    try {
+        const { clave_pregunta } = req.body;
+        console.log("clave de la pregunta: " + clave_pregunta)
+        const [result] = await pool.query("UPDATE Banco_preguntas_ECOA SET archivada = 1 WHERE clave_pregunta = ?;", [clave_pregunta]);
+        console.log("Se archivo la pregunta " + clave_pregunta + " exitosamente");
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ message: error.message })
+    }
+}
+
+export const unarchiveQuestion = async (req, res) => {
+    try {
+        const { clave_pregunta } = req.body;
+        const [result] = await pool.query("UPDATE Banco_preguntas_ECOA SET archivada = 0 WHERE clave_pregunta = ?;", [clave_pregunta]);
+        console.log("Se desarchivo la pregunta " + clave_pregunta);
     } catch (error) {
         console.log(error.message);
         return res.status(500).json({ message: error.message })

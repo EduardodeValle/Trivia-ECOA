@@ -30,9 +30,9 @@ const job = new CronJob('0 0 * * *', async function () {
             console.log(survey.clave_encuesta);
             const fecha_inicio_encuesta = survey.fecha_inicio.slice(0, 10);
             const fecha_final_encuesta = survey.fecha_final.slice(0, 10);
-            if ((fecha_actual >= fecha_inicio_encuesta) && (fecha_actual <= fecha_final_encuesta) && (survey.activa === 0)) { // si la fecha actual esta en un periodo de encuestas hay que activar la encuesta respectiva
+            if ((fecha_actual >= fecha_inicio_encuesta) && (fecha_actual <= fecha_final_encuesta) && (survey.activa === 0)) { // si la fecha actual esta en un periodo de encuestas hay que activar la encuesta respectiva y crear los registros de juegos para los alumnos que reciben la encuesta
                 console.log("Se encontro que la encuesta " + survey.clave_encuesta + " debe activarse");
-                const response = await axios.post('http://localhost:4000/activateSurvey', { clave_encuesta: survey.clave_encuesta }); // se debe activar la encuesta
+                const response_1 = await axios.post('http://localhost:4000/activateSurvey', { clave_encuesta: survey.clave_encuesta }); // se debe activar la encuesta y crear los registros de los estudiantes que reciben la encuesta
                 console.log("Activada la encuesta " + survey.clave_encuesta + " exitosamente");
                 break; // ya no hay mas encuestas por activar
             } 

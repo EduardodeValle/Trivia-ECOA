@@ -14,6 +14,8 @@ const UserProvider = (props) => {
           setMSG,
           preguntas,
           setPreguntas,
+          preguntasArchivadas,
+          setPreguntasArchivadas,
           encuestas,
           setEncuestas
         }}

@@ -37,9 +37,10 @@ function App() {
 function AppWithContext() {
   const [msg, setMSG] = useState('');
   const [preguntas, setPreguntas] = useState([]);
+  const [preguntasArchivadas, setPreguntasArchivadas] = useState([]);
   const [encuestas, setEncuestas] = useState([]);
   return (
-    <UserContext.Provider value={{ msg, setMSG, preguntas, setPreguntas, encuestas, setEncuestas }}>
+    <UserContext.Provider value={{ msg, setMSG, preguntas, setPreguntas, preguntasArchivadas, setPreguntasArchivadas, encuestas, setEncuestas }}>
       <App />
     </UserContext.Provider>
   );

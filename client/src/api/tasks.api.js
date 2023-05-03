@@ -6,11 +6,17 @@ export const RequestLogin = async (credentials) =>
 export const RequestStudentSurvey = async (matricula) =>
     await axios.post('http://localhost:4000/student-survey', matricula)
 
-export const RequestQuestions = async () =>
-    await axios.get('http://localhost:4000/getQuestions')
+export const RequestQuestions = async (archivado) =>
+    await axios.post('http://localhost:4000/getQuestions', archivado)
+
+export const ArchiveQuestion = async (data) =>
+    await axios.post('http://localhost:4000/archiveQuestion', data)
+
+export const UnarchiveQuestion = async (data) =>
+    await axios.post('http://localhost:4000/unarchiveQuestion', data)
 
 export const RequestSurveys = async () =>
     await axios.get('http://localhost:4000/getSurveys')
 
-export const postQuestion = async (data) =>
+export const PostQuestion = async (data) =>
     await axios.post('http://localhost:4000/postQuestion', data)

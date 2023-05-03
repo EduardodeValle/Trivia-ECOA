@@ -11,7 +11,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormLabel from '@mui/material/FormLabel';
-import { postQuestion } from '../api/tasks.api.js'
+import { PostQuestion, ArchiveQuestion, UnarchiveQuestion } from '../api/tasks.api.js'
 import { UserContext } from '../context/UserContext.jsx'
 import { useNavigate } from 'react-router-dom';
 
@@ -24,14 +24,30 @@ function Preguntas() {
 
   // funcion que agrega nuevas preguntas a la base de datos
   const newQuestion = async () => {
-    console.log(clave_pregunta + " " + descripcion + " " + tipo + " " + dirigido);
+    //console.log(clave_pregunta + " " + descripcion + " " + tipo + " " + dirigido);
     const data = {
       clave_pregunta: clave_pregunta,
       descripcion: descripcion,
       tipo: tipo,
       dirigido_a: dirigido
     };
-    const response = await postQuestion(data);
+    const response = await PostQuestion(data);
+  };
+
+  const archiveQuestion = async () => {
+    console.log(clave_pregunta);
+    const data = {
+      clave_pregunta: clave_pregunta
+    };
+    const response = await ArchiveQuestion(data);
+  };
+
+  const unarchiveQuestion = async () => {
+    console.log(clave_pregunta);
+    const data = {
+      clave_pregunta: clave_pregunta
+    };
+    const response = await UnarchiveQuestion(data);
   };
 
   const navigate = useNavigate();
@@ -39,7 +55,7 @@ function Preguntas() {
     navigate('/admin');
   };
 
-  const { preguntas } = useContext(UserContext);
+  const { preguntas, preguntasArchivadas } = useContext(UserContext);
 
   const [selectedOption1, setSelectedOption1] = useState("");
   const [selectedOption2, setSelectedOption2] = useState("");
@@ -47,17 +63,21 @@ function Preguntas() {
 
   const handleSelectChange1 = (event) => {
     setSelectedOption1(event.target.value);
+    setClave(event.target.value); // obtener el nuevo valor para archivar una pregunta
   };
 
   const handleSelectChange2 = (event) => {
     setSelectedOption2(event.target.value);
+    setClave(event.target.value); // obtener el nuevo valor para desarchivar una pregunta
   };
 
   const handleSelectChange3 = (event) => {
     setSelectedOption3(event.target.value);
   };
 
-  const MenuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion }));
+  const MenuItems = preguntas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion })); // Items de preguntas no archivadas
+  const MenuItemsArchived = preguntasArchivadas.map(pregunta => ({ value: pregunta.clave_pregunta, label: pregunta.descripcion })); // items de preguntas archivadas
+
 
   return (
     <div>
@@ -128,7 +148,7 @@ function Preguntas() {
                 <TextField fullWidth label="" value={selectedOption1 ? MenuItems.find(item => item.value === selectedOption1).label : ""} id="descripcion_1" InputProps={{readOnly: true,}} />
               </p>
               <p className="bajas-text2">
-                <Button variant="contained">Archivar</Button>
+                <Button variant="contained" onClick={archiveQuestion}>Archivar</Button>
               </p>
             </div>
             <div className="grey-container-middle2">
@@ -143,7 +163,7 @@ function Preguntas() {
                     value={selectedOption2}
                     onChange={handleSelectChange2}
                   >
-                    {MenuItems.map(menuItem => (
+                    {MenuItemsArchived.map(menuItem => (
                       <MenuItem key={menuItem.value} value={menuItem.value}>
                         {menuItem.value}
                       </MenuItem>
@@ -152,10 +172,10 @@ function Preguntas() {
                 </FormControl>
               </p>
               <p className="archivar-text1">
-                <TextField fullWidth label="" value={selectedOption2 ? MenuItems.find(item => item.value === selectedOption2).label : ""} id="descripcion_2" InputProps={{readOnly: true,}}  />
+                <TextField fullWidth label="" value={selectedOption2 ? MenuItemsArchived.find(item => item.value === selectedOption2).label : ""} id="descripcion_2" InputProps={{readOnly: true,}}  />
               </p>
               <p className="bajas-text2">
-                <Button variant="contained">Archivar</Button>
+                <Button variant="contained" onClick={unarchiveQuestion}>Desarchivar</Button>
               </p>
             </div>
           </div>

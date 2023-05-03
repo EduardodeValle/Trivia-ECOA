@@ -9,7 +9,7 @@ function Login() {
   const [id_usuario, setid_usuario] = useState('');
   const [contrasenia, setPassword] = useState('');
   const navigate = useNavigate();
-  const { msg, setMSG, preguntas, setPreguntas, encuestas, setEncuestas } = useContext(UserContext);
+  const { msg, setMSG, preguntas, setPreguntas, preguntasArchivadas, setPreguntasArchivadas, encuestas, setEncuestas } = useContext(UserContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -31,10 +31,12 @@ function Login() {
       }
       else if (response_login.data.ocupacion === 'Profesor') { navigate('/teacher'); }
       else if (response_login.data.ocupacion === 'Colaborador' || response_login.data.ocupacion === 'ProfesorColaborador') { 
-        const questions_response = await RequestQuestions();
+        let questions_response = await RequestQuestions( {archivado: 0} );
+        setPreguntas(questions_response.data); // estableciendo preguntas no archivadas
+        questions_response = await RequestQuestions( {archivado: 1} );
+        setPreguntasArchivadas(questions_response.data); // estableciendo preguntas archivadas
         const surveys_response = await RequestSurveys();
-        setPreguntas(questions_response.data);
-        setEncuestas(surveys_response.data);
+        setEncuestas(surveys_response.data); // estableciendo encuestas no archivadas
         //console.log("===============================================");
         //console.log(preguntas)
         //console.log("===============================================");
@@ -68,7 +70,7 @@ function Login() {
                 <div className="mb-3">
                   <label htmlFor="contrasenia" className="form-label">Contraseña:</label>
                   <input
-                    type="contrasenia"
+                    type="password"
                     className="form-control"
                     id="contrasenia"
                     placeholder="Ingresa tu contraseña"
