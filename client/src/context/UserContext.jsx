@@ -14,6 +14,8 @@ const UserProvider = (props) => {
           setIDusuario,
           user_name,
           setUserName,
+          user_role, 
+          setUserRole,
           msg,
           setMSG,
           preguntas,

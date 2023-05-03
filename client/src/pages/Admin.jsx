@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import './Admin.css';
 import Button from '@mui/material/Button/index.js';
 import { useNavigate } from 'react-router-dom';
@@ -33,8 +33,14 @@ function Admin() {
       <h1 className="admin-header">{msg}</h1>
       <div className="admin-main">
         <div className="admin-left-section">
-          <h2>Generador de Encuestas</h2>
-          <p>Genera más encuestas para agregar a la ECOA.</p>
+          <h2 className='admin-title-1'>Generador de Encuestas</h2>
+          <div className="text-justify">
+            <p>Bienvenido al Generador de Encuestas. Aquí podrás modificar las preguntas disponibles, crear encuestas, y activar las encuestas eliginedo las sección adecuada. </p>
+            <p>Configuración de Preguntas te permite crear, archivar, desarchivar, y cambiar preguntas.</p>
+            <p>Configuración de Encuestas te permite crear, archivar, y desarchivar encuestas para habilitar su funcionamiento.</p>
+            <p>Activación de Encuestas te permite seleccionar una encuesta ya previamente creada y determinar una fecha en la que estará activa.</p>
+          </div>
+
         </div>
         <div className="admin-right-sections">
           <div className="admin-section">

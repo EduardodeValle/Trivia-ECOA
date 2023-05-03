@@ -37,13 +37,14 @@ function App() {
 function AppWithContext() {
   const [id_usuarioContext, setIDusuario] = useState('');
   const [user_name, setUserName] = useState([]);
+  const [user_role, setUserRole] = useState([]);    
   const [msg, setMSG] = useState('');
   const [preguntas, setPreguntas] = useState([]);
   const [preguntasArchivadas, setPreguntasArchivadas] = useState([]);
   const [encuestas, setEncuestas] = useState([]);
   const [encuestasArchivadas, setEncuestasArchivadas] = useState([]);
   return (
-    <UserContext.Provider value={{ id_usuarioContext, setIDusuario, user_name, setUserName, msg, setMSG, preguntas, setPreguntas, preguntasArchivadas, setPreguntasArchivadas, encuestas, setEncuestas, encuestasArchivadas, setEncuestasArchivadas }}>
+    <UserContext.Provider value={{ id_usuarioContext, setIDusuario, user_role, setUserRole, user_name, setUserName, msg, setMSG, preguntas, setPreguntas, preguntasArchivadas, setPreguntasArchivadas, encuestas, setEncuestas, encuestasArchivadas, setEncuestasArchivadas }}>
       <App />
     </UserContext.Provider>
   );
