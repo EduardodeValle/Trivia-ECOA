@@ -192,3 +192,13 @@ export const archiveSurvey = async (req, res) => {
         return res.status(500).json({ message: error.message })
     }
 }
+
+export const unarchiveSurvey = async (req, res) => {
+    try {
+        const { clave_encuesta } = req.body;
+        const [result] = await pool.query("UPDATE Encuesta SET archivada = 0 WHERE clave_encuesta = ?;", [clave_encuesta]);
+        console.log("Se desarchivo la encuesa " + clave_encuesta + " exitosamente");
+    } catch(error) {
+
+    }
+}

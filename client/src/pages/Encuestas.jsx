@@ -10,7 +10,7 @@ import Checkbox from '@mui/material/Checkbox/index.js';
 import TextField from '@mui/material/TextField/index.js';
 import Button from '@mui/material/Button/index.js';
 import ArrowBackIcon from '@mui/icons-material/esm/ArrowBack.js';
-import { PostSurvey, ArchiveSurvey } from '../api/tasks.api.js'
+import { PostSurvey, ArchiveSurvey, UnarchiveSurvey } from '../api/tasks.api.js'
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext.jsx'
 
@@ -40,7 +40,9 @@ function Encuestas() {
   const [preguntasClient, setPreguntas] = useState([]); // preguntasClient son las preguntas seleccionadas por el cliente en el dropdown
   const [personName, setPersonName] = React.useState([]);
   const [selectedOption1Description, setSelectedOption1Description] = useState("");
+  const [selectedOption2Description, setSelectedOption2Description] = useState("");
   const [preguntasDeEncuesta, setPreguntasDeEncuesta] = useState([]);
+  const [preguntasArchivadasDeEncuesta, setPreguntasArchivadasDeEncuesta] = useState([]);
 
   const { encuestas, encuestasArchivadas, preguntas } = useContext(UserContext);
 
@@ -74,10 +76,24 @@ function Encuestas() {
     const response = await ArchiveSurvey(data);
   };
 
+  const unarchiveSurvey = async () => {
+    //console.log("Desarchivando la encuesta " + clave_encuesta);
+    const data = {
+      clave_encuesta: clave_encuesta
+    };
+    const response = await UnarchiveSurvey(data);
+  }
+
   const [selectedOption1, setSelectedOption1] = useState(""); // actualiza los valores del FormControl para archivar encuestas
+  const [selectedOption2, setSelectedOption2] = useState(""); // actualiza los valores del FormControl para desarchivar encuestas
 
   const handleSelectChange1 = (event) => {
     setSelectedOption1(event.target.value);
+    setClave(event.target.value); // obtener el nuevo valor para archivar una encuesta
+  };
+
+  const handleSelectChange2 = (event) => {
+    setSelectedOption2(event.target.value);
     setClave(event.target.value); // obtener el nuevo valor para archivar una encuesta
   };
 
@@ -91,6 +107,17 @@ function Encuestas() {
       setPreguntasDeEncuesta([]);
     }
   }, [selectedOption1, encuestas]);
+
+  useEffect(() => {
+    if (selectedOption2) {
+      const selectedEncuesta2 = encuestasArchivadas.find(encuesta => encuesta.clave_encuesta === selectedOption2);
+      setSelectedOption2Description(selectedEncuesta2.descripcion);
+      setPreguntasArchivadasDeEncuesta(selectedEncuesta2.preguntas_de_encuesta);
+    } else {
+      setSelectedOption2Description("");
+      setPreguntasArchivadasDeEncuesta([]);
+    }
+  }, [selectedOption2, encuestasArchivadas]);
 
   const navigate = useNavigate();
   const handleRegresar = () => {
@@ -191,15 +218,19 @@ function Encuestas() {
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="Identificador Único"
+                  value={selectedOption2}
+                  onChange={handleSelectChange2}
                 >
-                  <MenuItem>Pregunta 1</MenuItem>
-                  <MenuItem>Pregunta 2</MenuItem>
-                  <MenuItem>Pregunta 3</MenuItem>
+                  {encuestasArchivadas.map(encuesta => (
+                    <MenuItem key={encuesta.clave_encuesta} value={encuesta.clave_encuesta}>
+                      {encuesta.clave_encuesta}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </div>
             <div className="crear-text1">
-              <TextField fullWidth label="Descripción" id="Descripción" />
+              <TextField fullWidth label="Descripción" value={selectedOption2Description} id="Descripción" />
             </div>
             <div className="archivar-text11">
               <FormControl fullWidth>
@@ -209,14 +240,14 @@ function Encuestas() {
                   id="demo-simple-select"
                   label="Observar Preguntas"
                 >
-                  <MenuItem>Pregunta 1</MenuItem>
-                  <MenuItem>Pregunta 2</MenuItem>
-                  <MenuItem>Pregunta 3</MenuItem>
+                  {preguntasArchivadasDeEncuesta.map((pregunta, index) => (
+                    <MenuItem key={index} value={pregunta}>{pregunta}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </div>
             <p className="archivar-text21">
-              <Button variant="contained">Desarchivar</Button>
+              <Button variant="contained" onClick={unarchiveSurvey}>Desarchivar</Button>
             </p>
           </div>
 
