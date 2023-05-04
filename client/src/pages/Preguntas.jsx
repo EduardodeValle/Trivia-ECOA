@@ -19,6 +19,7 @@ function Preguntas() {
 
   const [clave_pregunta, setClave] = useState("");
   const [descripcion, setDescripcion] = useState("");
+  const [descripcion2, setDescripcion2] = useState("");
   const [tipo, setTipo] = useState("Cerrada");
   const [dirigido, setDirigido] = useState("Profesor");
 
@@ -87,7 +88,7 @@ function Preguntas() {
     setSelectedOption3(event.target.value);
     const selectedPregunta = preguntas.find(pregunta => pregunta.clave_pregunta === event.target.value);
     setClave(event.target.value);
-    setDescripcion(selectedPregunta.descripcion);
+    setDescripcion2(selectedPregunta.descripcion);
     setDirigido(selectedPregunta.dirigido_a);
     setTipo(selectedPregunta.tipo);
   };
@@ -217,7 +218,7 @@ function Preguntas() {
               </FormControl>
             </p>
             <p className="altas-text1">
-              <TextField fullWidth label="" value={descripcion} onChange={(event) => setDescripcion(event.target.value)} />
+              <TextField fullWidth label="" value={descripcion2} onChange={(event) => setDescripcion2(event.target.value)} />
             </p>
             <p className="altas-text2">Tipo:
               <FormControl>
