@@ -55,7 +55,7 @@ function Preguntas() {
     //console.log(clave_pregunta + " " + descripcion + " " + dirigido + " " + tipo);
     const data = {
       clave_pregunta: clave_pregunta,
-      descripcion: descripcion,
+      descripcion: descripcion2,
       dirigido_a: dirigido,
       tipo: tipo
     };

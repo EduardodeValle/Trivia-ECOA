@@ -593,6 +593,9 @@ DELETE FROM Preguntas_de_encuesta WHERE clave_encuesta = "s4";
 
 UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = "s1";
 DELETE FROM Banco_preguntas_ECOA WHERE dirigido_a IS NULL;
+DELETE FROM Banco_preguntas_ECOA WHERE clave_pregunta = "PreguntaN";
+UPDATE Banco_preguntas_ECOA SET archivada = 1 WHERE clave_pregunta = "pregunta9";
+UPDATE Banco_preguntas_ECOA SET descripcion = "El profesor brindo recursos y ayuda al alumno" WHERE clave_pregunta = "preguntaX";
 
 SELECT * FROM Encuesta;
 SELECT * FROM Preguntas_de_encuesta;
