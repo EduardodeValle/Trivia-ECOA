@@ -557,10 +557,36 @@ SELECT Cursa.alumno_matricula, Materia.nombre_materia_largo, Materia.clave_mater
 INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
 WHERE Materia.CRN = 15073;
 
+UPDATE Materia SET activa = 1 WHERE CRN = 34643;
+UPDATE Materia SET activa = 1 WHERE CRN = 34652;
+UPDATE Materia SET activa = 1 WHERE CRN = 15440;
+UPDATE Materia SET activa = 1 WHERE CRN = 29227;
+UPDATE Materia SET activa = 1 WHERE CRN = 24329;
+
 # Profesores que imparten la materia
 SELECT Imparte.profesor_nomina, Materia.nombre_materia_largo, Materia.clave_materia FROM Imparte 
 INNER JOIN Materia ON (Imparte.CRN = Materia.CRN)
 WHERE Materia.CRN = 15073;
+
+SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Cursa.CRN FROM Alumno
+INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula) 
+INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
+WHERE Alumno.alumno_matricula = 'A00242500';
+
+# obteniendo todas las materias que estudia el alumno
+SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Cursa.CRN FROM Alumno
+INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula) 
+INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
+WHERE Alumno.alumno_matricula = 'A01620860';
+# A00228079 A00228187 A00229540 A00230117
+
+# obteniendo todos los profesores que imparten una materia
+SELECT * FROM Materia 
+INNER JOIN Imparte ON (Materia.CRN = Imparte.CRN)
+INNER JOIN Profesor ON (Imparte.profesor_nomina = Profesor.profesor_nomina)
+WHERE Materia.CRN = 41765;
+
+
 
 UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = "s1";
 DELETE FROM Banco_preguntas_ECOA WHERE dirigido_a IS NULL;
@@ -571,24 +597,32 @@ SELECT * FROM Banco_preguntas_ECOA;
 SELECT * FROM ECOA_temporal;
 
 UPDATE Encuesta SET archivada = 0, activa = 0, fecha_inicio = NULL, fecha_final = NULL WHERE clave_encuesta = "s1";
-UPDATE Encuesta SET archivada = 0, activa = 0, fecha_inicio = '2023-05-03', fecha_final = '2023-05-10' WHERE clave_encuesta = "s1";
+UPDATE Encuesta SET archivada = 0, activa = 1, fecha_inicio = '2023-05-03', fecha_final = '2023-05-10' WHERE clave_encuesta = "s1";
 UPDATE Encuesta SET activa = 1 WHERE clave_encuesta = "s1";
 UPDATE Encuesta SET archivada = 1 WHERE clave_encuesta = "s2";
 DELETE FROM Encuesta WHERE clave_encuesta = "Otra";
 DELETE FROM Preguntas_de_encuesta WHERE clave_encuesta = "Otra";
 
 SELECT * FROM Progreso_ECOA;
+SELECT * FROM ECOA_temporal;
 SELECT * FROM Elementos_de_partida;
 TRUNCATE TABLE ECOA_temporal;
 TRUNCATE TABLE Progreso_ECOA;
 TRUNCATE TABLE Elementos_de_partida;
 
+SELECT * FROM Colaborador;
+
 CALL setProgresoECOA();						# crear registros de videojuegos de los alumnos que reciben encuesta
-CALL getSurvey('A00242489'); 				# ver si el alumno actual tiene encuesta disponible
-CALL getTeachersQuestions('A00242489'); 	# otener preguntas faltantes de profesores de todas las materias
-CALL getSubjectsQuestions('A00242489');  	# obtener preguntas faltantes de las materias que cursa el alumno	    
-CALL getCoreSubjectsQuestions('A00242489'); # obtener preguntas faltantes de los bloques que cursa el alumno
+CALL getSurvey('A00241579'); 				# ver si el alumno actual tiene encuesta disponible
+CALL getTeachersQuestions('A00241579'); 	# otener preguntas faltantes de profesores de todas las materias
+CALL getSubjectsQuestions('A00241579');  	# obtener preguntas faltantes de las materias que cursa el alumno	    
+CALL getCoreSubjectsQuestions('A00241579'); # obtener preguntas faltantes de los bloques que cursa el alumno
 CALL finishSurvey();						# eliminar preguntas sin terminar, desactivar encuesta y materias al finalizar periodo
+
+SELECT Alumno.alumno_matricula, Materia.nombre_materia_largo, Materia.tipodeUdF, Cursa.CRN FROM Alumno
+INNER JOIN Cursa ON (Alumno.alumno_matricula = Cursa.alumno_matricula) 
+INNER JOIN Materia ON (Cursa.CRN = Materia.CRN)
+WHERE Alumno.alumno_matricula = 'A00242500';
 
  -- A00242500 alumno que no ha terminado todas las preguntas de profesores, faltan las preguntas de materias y bloques
 insert into ECOA_temporal(alumno_matricula, clave_encuesta, clave_pregunta, respuesta, CRN, profesor_nomina) values ("A00242500", "s1", "pregunta1", "8", NULL, 'L00621778');
@@ -656,7 +690,6 @@ insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) 
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta7", "Los temas, las actividades y el reto durante el Bloque son aplicables y de valor:", "Bloque", "Cerrada");
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo) values ("pregunta8", "El acompañamiento que recibí por parte del profesor fue adecuado:", "Profesor", "Cerrada");
 insert into Banco_preguntas_ECOA(clave_pregunta, descripcion, dirigido_a, tipo, archivada) values ("pregunta9", "Me gusto tanto la materia que volveria a repetirla:", "Materia", "Cerrada", 1);
-
 
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta1");
 insert into Preguntas_de_encuesta(clave_encuesta, clave_pregunta) values ("s1","pregunta2");
